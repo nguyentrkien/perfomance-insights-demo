@@ -1,0 +1,37 @@
+.tabs{
+    .btn-group{
+        label{
+            background: #e3e3e3b6 !important;
+            margin-bottom: -1px !important;
+            color: black !important;
+            border: 1px solid #cacaca !important;
+            border-radius: 0 !important;
+            &:active{
+                background: #e3e3e3 !important;
+            }
+            
+        }
+        .active{
+            background: white !important;
+            box-shadow: none !important;
+            border-bottom: 1px solid white !important;
+            &:hover{
+                background: white!important;
+            }
+        }
+    }
+}
+
+.header-dashboard{
+    .title{
+        margin: 10px 0px;
+        padding: 0 15px;
+    }
+    img{
+        width: 10%;
+        margin-right: 5px;
+    }
+    .row:last-child{
+        border-bottom: 1px solid #e3e3e3 !important;
+    }
+}

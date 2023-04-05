@@ -1,0 +1,78 @@
+.content{
+    .row{
+        margin: 0;
+        .tabs{
+            padding: 0 15px;
+        }
+    }
+    .dashboard{
+        padding: 5px;
+        .widgets-panel{
+            background: #ffffff;
+            padding: 2% 5%;
+            position: relative;
+            .resize-button{
+                opacity: 0.5;
+                bottom: 0;
+                position: absolute;
+                width: 25px;
+                right: 0;
+            }
+        }
+        .container{
+            height: 100vh;
+            position: relative;
+            padding: 0;
+        }
+        .edit{
+            border: 2px dashed #6877fe;
+        }
+        .button-header-setting{
+            display: flex;
+            justify-content: flex-end;
+            .new, .save{
+                display: flex;
+                margin: 0 10px;
+                padding: 10px 0;
+                color: blue;
+                cursor: pointer;
+                opacity: 0.5;
+                border-radius: 2px;
+                align-items: center;
+                i{
+                    font-size: 20px;
+                    padding: 0 5px;
+                }
+                div{
+                    padding-right: 5px;
+                }
+                &:hover{
+                    opacity: 1;
+                    background: #e3e3e3;
+                }
+            }
+            .setting{
+                margin: 0 10px;
+                padding: 10px 0;
+                color: blue;
+                cursor: pointer;
+                opacity: 0.5;
+                align-items: center;
+                i{
+                    font-size: 20px;
+                    padding: 0 5px;
+                }
+                div{
+                    padding-right: 5px;
+                }
+                &:hover{
+                    opacity: 1;
+                }
+            }
+
+            .unactived{
+                display: none;
+            }
+        }
+    }
+}
