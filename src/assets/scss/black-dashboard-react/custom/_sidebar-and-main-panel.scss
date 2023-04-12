@@ -493,16 +493,17 @@
   // }
 
   > .content {
-    padding: 40px 0px 30px 100px;
-    min-height: calc(100vh - 70px);
+    padding: 40px 0px 0px 100px;
+    min-height: calc(100vh);
     .charts{
       display: flex;
       flex-direction: column-reverse;
     }
     .row{
       input{
-        margin: 25px 15px 0 15px;
-        width: 100% !important;
+        text-align: right;
+        width: 85px !important;
+        // width: 100% !important;
       }
       button{
         position: absolute;
@@ -521,9 +522,9 @@
       width: 35px;
       height: 35px;
       border-radius: 35px;
-      border: 2px solid #e3e3e3;
-      background-color:#e3e3e3;
-      color: black;
+      border: 2px solid #2f61f5;
+      background-color: #2f61f5;
+      color: #ffffff;
       transition: width 0.5s;
       font-weight: 400;
       margin: 10px 0;
@@ -554,7 +555,7 @@
         transition-delay: 0.5s;
       }
       &:hover {
-        width: 150px;
+        width: 200px;
         transition: width 0.5s;
       }
 

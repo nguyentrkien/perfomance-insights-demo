@@ -11,7 +11,11 @@ const initialState = {
         {name: 'add', type: 'add', asset: 'edge', id: 'add'},
     ],
     timerange: ['day','month','year'],
+    period: ['minute','hour','day'],
+    Aggregation: ['Average','Max','Min','Sum'],
     widgets: [],
+    singleData: '',
+    getInitData: false,
 }
 
 export const getVar = createAsyncThunk("State/getVar",
@@ -25,6 +29,44 @@ export const getAssets = createAsyncThunk("State/getAssets",
     async () => {
         const {data: {assets}}= await axios.get(`http://localhost:4000/Assets`)
         return assets
+    }
+)
+
+export const getDatas = createAsyncThunk("State/getDatas",
+    async ({variableId, startDate, toDate, timeRange}) => {
+        var dataRequest = JSON.stringify({
+            "from": `${startDate}`,
+            "to": `${toDate}`,
+            "calculationTimeRange": timeRange,
+            "dataSources": [
+              {
+                "id": `${variableId}`,
+                "type": "Variable",
+                "aggregation": "Average"
+              }
+            ]
+          });
+          
+        var config = {
+            method: 'post',
+            url: 'http://localhost:4000/CalculateTrend',
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            data : dataRequest
+          };
+        var {data} = await axios(config);
+        return data
+    }
+)
+
+export const getSingleData = createAsyncThunk("State/singleData",
+    async ({variableId, startDate, toDate}) => {
+        console.log(variableId, startDate, toDate)
+        // const {data}= await axios.get(`http://localhost:4000/Data/00da5d7cf41749668af59b257add0252?from=2023-04-10T01:52:23.933Z&to=2023-04-10T01:52:24.935Z`)
+        const {data:{data}}= await axios.get(`http://localhost:4000/Data/${variableId}?from=${startDate}&to=${toDate}`)
+        console.log(data)
+        return data
     }
 )
 
@@ -71,6 +113,13 @@ const StateSlice = createSlice({
             // console.log(action.payload);
             state.getAssets = action.payload;
             state.isGetAssets = true;
+        })
+        builder.addCase(getDatas.fulfilled,(state,action)=> {
+            state.getDatas = action.payload;
+        })
+        builder.addCase(getSingleData.fulfilled,(state,action)=> {
+            state.singleData = action.payload[0].values[0].value;
+            state.getInitData = true;
         })
     },
 }) 

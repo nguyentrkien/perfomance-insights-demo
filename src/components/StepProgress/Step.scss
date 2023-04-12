@@ -1,6 +1,73 @@
+.form-group{
+  padding: 10px;
+  .step-header{
+    margin: 0;
+  }
+  .step-content{
+    margin-top: 40px;
+    .bold{
+      font-weight: 600;
+    }
+    input[name="widgetName"] {
+      width: 50%;
+    }
+    .interval-timerange{
+      padding: 10px 10px;
+      margin-top: 20px;
+      border: 1px solid #cecece;
+      input[name="periodNum"]{
+        width: 10%;
+        border-radius: 0;
+      }
+      select[name="periodUnit"]{
+        width: 20%;
+      }
+      .period{
+        display: flex;
+        column-gap: 10px;
+      }
+    }
+    .pattern{
+      background: #e3e3e3;
+      border-right: 2px solid #222a425c;
+      border-left: 2px solid #222a425c;
+      border-bottom: 2px solid #222a425c;
+      input{
+        background: white;
+      }
+      .flex-3{
+        display: flex;
+        width: 100%;
+        .item{
+          flex-grow: 1;
+          padding: 15px 34px;
+          row-gap: 5px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          &:first-child{
+            border-right: 2px solid #222a425c;
+          }
+          &:last-child{
+            border-left: 2px solid #222a425c;
+          }
+        }
+      }
+      .warning-setting{
+        border-top: 2px solid #222a425c;
+        padding: 10px 0;
+      }
+      .yLabel{
+        padding: 10px;
+      }
+    }
+  }
+}
+
 .widgets{
     display: flex;
     justify-content: space-evenly;
+    margin: 40px 0;
     .card-icon{
         width: 130px;
         height: 130px;
@@ -24,13 +91,14 @@
 }
 .card-param{
     display: flex;
-    margin: 0 10px;
+    margin: 10px 0 0;
     align-items: center;
     justify-content: space-between;
-    border: 1px solid #e3e3e3;
+    border: 2px solid #222a425c;
     padding: 2px 15px 2px 37px;
     .param-name{
         font-size: 16px;
+        min-width: 200px;
         font-weight: 700;
     }
     .var{
@@ -44,12 +112,40 @@
     }
 }
 
+.dropdown{
+  .pick-color{
+    background: white !important;
+    margin: 0 !important;
+    &:hover{
+      background: white !important;
+    }
+    &:focus{
+      background: white !important;
+    }
+  }
+  button.dropdown-toggle{
+    background: #e3e3e3;
+    color: black;
+    border: 1px solid #e3e3e3;
+    padding: 5px 20px;
+    border-radius: 5px;
+    &:hover{
+      background: #e3e3e3 !important;
+      color: black !important;
+    }
+  }
+}
+
 .dropdown-toggle{
     display: flex;
     .circle-color{
         border-radius: 50%;
         width: 40px;
         height: 40px;
+    }
+
+    &::after{
+      display: none;
     }
 }
 
@@ -72,7 +168,7 @@
     .limit_values{
       display: flex;
       width: 100%;
-      margin: 0 109px;
+      margin: 0 107px;
       justify-content: space-evenly;
     }
     .input_limit_value{

@@ -9,6 +9,7 @@ import StepFive from 'components/StepProgress/StepFive';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { addWidget } from 'store';
 import { useDispatch } from 'react-redux';
+import './CreateWidget.scss'
 
 
 export default function CreateWidget({asset, id}) {
@@ -23,8 +24,10 @@ export default function CreateWidget({asset, id}) {
         parameter: [{
             set: false,
             name: '',
+            varId: '',
             type: ''
           }],
+        multiSelect: [],
         alternativeLabel: '',
         decimalNumber: 2,
         color: '#03a9f4',
@@ -33,6 +36,9 @@ export default function CreateWidget({asset, id}) {
         highlimitwarning: '',
         highlimitalert: '',
         yAxisLabel: '',
+        UnitGauge: '',
+        minRange: '',
+        maxRange: '',
     });
 
     const nextPage = (pageNumber) => {
@@ -50,9 +56,6 @@ export default function CreateWidget({asset, id}) {
             case 'pagefour':
                 setPage('pagethree')
                 break
-            case 'pagefive':
-                setPage('pagefour')
-                break
         }
     }
 
@@ -66,9 +69,6 @@ export default function CreateWidget({asset, id}) {
                 break
             case 'pagethree':
                 setPage('pagefour')
-                break
-            case 'pagefour':
-                setPage('pagefive')
                 break
         }
     }
@@ -97,10 +97,11 @@ export default function CreateWidget({asset, id}) {
         }))
     }
 
-    const handleSelectParam = (set, type, name) => {
+    const handleSelectParam = (set, type, name, varId) => {
         let updateValue = {parameter: [{
             set: set,
             name: name,
+            varId: varId,
             type: type
           }]}
         setForm(form => ({
@@ -109,9 +110,31 @@ export default function CreateWidget({asset, id}) {
         }))
     }
 
+    const handleMultiSelect = (selectedOption) => {
+        console.log(selectedOption)
+        setForm(form => ({
+            ...form,
+            multiSelect: selectedOption
+        }))
+    }
+
+    const handleMultiChange = (e, index) => {
+        const updateValue = form.multiSelect.map((element,i) => {
+            if (i == index)
+                return {...element,[e.target.name]: e.target.value} 
+            else 
+                return element
+        })
+        console.log(updateValue)
+        setForm(form => ({
+            ...form,
+            multiSelect: updateValue
+        }))
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert(`${form.widgetType},${form.widget},${form.name}`);
+        alert(`${form.widgetType},${asset},${id}`);
         dispatch(addWidget({
             asset: asset,
             id: id,
@@ -120,19 +143,32 @@ export default function CreateWidget({asset, id}) {
             periodNum: form.periodNum,
             periodUnit: form.periodUnit,
             parameter: form.parameter,
+            multiSelect: form.multiSelect,
             alternativeLabel: form.alternativeLabel,
             decimalNumber: form.decimalNumber,
             color: form.color,
             lowlimitalert: form.lowlimitalert,
             lowlimitwarning: form.lowlimitwarning,
-            highlimitwarning: form.highlimitalert,
-            highlimitalert: form.highlimitwarning,
+            highlimitwarning: form.highlimitwarning,
+            highlimitalert: form.highlimitalert,
             yAxisLabel: form.yAxisLabel,
-            width: '400', 
-            height: '200',
+            width: `${{
+                    "Diagram":'400',
+                    "Pie": '245',
+                    "Gauge": '295',
+
+                }[form.widgetType]}`, 
+            height: `${{
+                "Diagram":'200',
+                "Pie": '245',
+                "Gauge": '210',
+                }[form.widgetType]}`,
             lastX: '0',
             lastY: '0',
-            ratio: 3.5,
+            ratio: 2,
+            UnitGauge: form.UnitGauge,
+            minRange: `${(form.minRange == '')?'0':form.minRange}`,
+            maxRange: form.maxRange,
         }))
         history.push(`/admin/device/${asset}/dashboard/${id}`);
     }
@@ -145,21 +181,30 @@ export default function CreateWidget({asset, id}) {
             {
                 pageone: <StepOne handleSelectWidget={handleSelectWidget} form={form}/>,
                 pagetwo: <StepTwo handleChange={handleChange} form={form}/>,
-                pagethree: <StepThree handleSelect={handleSelectParam} form={form}/>,
-                pagefour: <StepFour handleChange={handleChange} handleSelectColor={handleSelectColor} form={form}/>,
-                pagefive: <StepFive handleChange={handleChange} handleSelectColor={handleSelectColor} form={form}/>,
+                pagethree: <StepThree handleSelect={handleSelectParam} handleMultiSelect={handleMultiSelect} form={form}/>,
+                pagefour: <StepFour handleChange={handleChange} handleMultiChange={handleMultiChange} handleSelectColor={handleSelectColor} form={form}/>,
                 }[page]
             }
-            {page != "pageone"
-            ? <Button type="button" color="secondary float-left" onClick={() => prevPageStage(page)}> Previous </Button>
-            : null}
-            {page != "pagefive"
-            ? <Button type="button" color="secondary float-left" onClick={() => nextPageStage(page)}> Next </Button>
-            : null}
-            {page == "pagefive"
-            ? <Button type='submit' color="secondary float-left" onClick={handleSubmit}> Submit </Button>
-            : null
-            }
+            <div className='button-groups'>
+                <button type="button" name='cancel' onClick={() => history.push(`/admin/device/${asset}/dashboard/${id}`)}> Cancel </button>
+                <div className='button-end'>
+                    {page != "pageone"
+                    ? <button type="button" onClick={() => prevPageStage(page)}> 
+                        <i className='tim-icons icon-minimal-left'></i>
+                        Previous 
+                    </button>
+                    : null}
+                    {page != "pagefour"
+                    ? <button type="button" onClick={() => nextPageStage(page)}> 
+                        Continue 
+                        <i className='tim-icons icon-minimal-right'></i>
+                    </button>
+                    : null}
+                    {page == "pagefour"
+                    ? <button type='submit' onClick={handleSubmit}> Submit </button>
+                    : null}
+                </div>
+            </div>
         </Form>
     </div>
   )

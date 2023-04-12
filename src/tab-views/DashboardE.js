@@ -20,6 +20,7 @@ export default function DashboardE({asset, id}) {
     const location = useLocation();
     const dashboards = useSelector(state => state.dashboards)
     const dashboardSelected = location.pathname.slice(location.pathname.lastIndexOf('/')+1, location.pathname.length)
+    console.log(dashboards)
     const NavigateCreateDashboard = () => {
       history.push(`/admin/device/${asset}/dashboard/add`)
     }
@@ -39,7 +40,10 @@ export default function DashboardE({asset, id}) {
           onClick={()=>history.push(`/admin/device/${element.asset}/dashboard/${element.id}`)}
           >
               <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                <div>{element.name}</div>
+                <div>
+                  <i className='tim-icons icon-tv-2' style={{marginRight: '5px'}}></i>
+                  {element.name}
+                </div>
               </span>
               <span className="d-block d-sm-none">
                 <i className="tim-icons icon-single-02"/>
@@ -99,7 +103,14 @@ export default function DashboardE({asset, id}) {
                 </div>
         </Row>
     </div>
-    <Panel asset={asset} id={id}></Panel>
+    {
+      dashboards.map((dashboard) => {
+        if (dashboard.id == dashboardSelected)
+        return (
+          <Panel asset={asset} id={id} dashboard={dashboard}></Panel>
+        )
+      })
+    }
     </>
   )
 }

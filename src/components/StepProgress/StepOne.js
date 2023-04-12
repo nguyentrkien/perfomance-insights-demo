@@ -12,7 +12,7 @@ export default function StepOne(props) {
   return (
     <>
         <FormGroup>
-          <div> 1. Widget type: </div>
+          <h3 className='step-header'> 1. Widget type: </h3>
           <div> Select one of the widget types. </div>
           <div className='widgets'>
             <div className={`card-icon ${select == 'Diagram'? 'active': null}`} onClick={()=> {setSelect('Diagram'); props.handleSelectWidget('Diagram')}}>

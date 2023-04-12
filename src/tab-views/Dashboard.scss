@@ -35,3 +35,107 @@
         border-bottom: 1px solid #e3e3e3 !important;
     }
 }
+
+.overview-panel,.dashboard-panel{
+    display: flex;
+    height: calc(100vh - 121px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    h4{
+        margin: 5px;
+    }
+    i.icon-tv-2{
+        font-size: 40px;
+        margin: 10px;
+        opacity: 0.6;
+    }
+    i.puzzle{
+        font-size: 40px;
+        rotate: 320deg;
+        margin: 10px;
+        opacity: 0.6;
+    }
+    button{
+        outline: none !important;
+    }
+}
+
+.dashboard-panel{
+    .btn{
+        background: #2f61f4 !important;
+    }
+}
+
+.export-component{
+    margin-top: 50px;
+    .dashboard-setting{
+        .export-data-button{
+            width: 100px;
+            font-weight: 500 !important;
+        }
+    }
+}
+
+.add-dashboard-panel{
+    padding: 20px 15px;
+    .content{
+        .dashboard-name-input{
+            margin-bottom: 15px;
+            div{
+                font-weight: 700;
+            }
+            input{
+                border-radius: 2px;
+            }
+        }
+        .dashboard-setting{
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+            border: 2px solid #e3e3e3;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            .time-range{
+                select{
+                    width: 100px;
+                }
+            }
+            .date-setting{
+                display: flex;
+                column-gap: 20px;
+                align-items: center;
+                .flatpickr-input{
+                    height: 29px;
+                }
+                .react-datepicker__input-container{
+                    display: flex;
+                    align-items: center;
+                }
+                svg{
+                    width: 20px;
+                }
+            }
+        }
+    }
+    .export-data-button,.create-dashboard-button{
+        border: none;
+        background: #2f61f4;
+        border-radius: 4px;
+        color: white;
+        padding: 5px 10px;
+        outline: none !important;
+    }
+
+    .cancel-dashboard-button{
+        margin-right: 5px;
+        border: none;
+        background: #e3e3e3;
+        border-radius: 4px;
+        color: black;
+        padding: 5px 10px;
+        outline: none !important;
+    }
+
+}

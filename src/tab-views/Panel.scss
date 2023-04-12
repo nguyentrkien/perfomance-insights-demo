@@ -9,8 +9,10 @@
         padding: 5px;
         .widgets-panel{
             background: #ffffff;
-            padding: 2% 5%;
+            padding: 1% 1%;
             position: relative;
+            border: 2px solid rgb(185, 185, 185);
+            border-radius: 1%;
             .resize-button{
                 opacity: 0.5;
                 bottom: 0;
@@ -18,9 +20,21 @@
                 width: 25px;
                 right: 0;
             }
+            .print-button {
+                opacity: 0.8;
+                top: 0;
+                position: absolute;
+                width: 18px;
+                right: 0;
+                margin: 4px;
+                cursor: pointer;
+                &:hover{
+                    opacity: 1;
+                }
+            }
         }
         .container{
-            height: 100vh;
+            height: calc(100vh - 167px);
             position: relative;
             padding: 0;
         }

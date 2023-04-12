@@ -87,35 +87,10 @@ function Dashboard({asset}) {
         );
     });
   };
-  function varAction(state, action){
-    switch (action.type) {
-        case "ADD":{
-          state.push(action.payload)
-          return state
-        }
-        case "DELETE":{
-          var newstate = state.filter(item => (item.name != action.payload.name)||(item.variable != action.payload.variable)||(item.period != action.payload.period))
-          return newstate
-        }
-        case "ALARM":{
-          var newstate = state.map(item => {
-            if (item.name == action.payload.name)
-            {
-              return action.payload
-            }
-            else
-              return item
-          })
-          return newstate
-        }
-        default:
-          return state
-    }
-  } 
+  
   React.useEffect(()=>{
     dispatch(getVar());
     history.push(`/admin/device/${asset}/dashboard/overview`);
-    console.log(dashboards);
   },[])
 
   return (

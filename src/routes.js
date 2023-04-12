@@ -18,7 +18,7 @@
 import Dashboard from "views/Dashboard.js";
 import Device from "views/Device.js";
 import Icons from "views/Icons.js";
-import Map from "views/Map.js";
+import Export from "views/Export.js"
 import Notifications from "views/Notifications.js";
 import Rtl from "views/Rtl.js";
 import TableList from "views/TableList.js";
@@ -43,11 +43,11 @@ var routes = [
     layout: "/admin"
   },
   {
-    path: "/maps",
-    name: "Map",
+    path: "/export",
+    name: "Export",
     rtlName: "خرائط",
-    icon: "tim-icons icon-pin",
-    component: Map,
+    icon: "tim-icons icon-paper",
+    component: Export,
     layout: "/admin"
   },
   {

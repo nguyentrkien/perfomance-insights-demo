@@ -91,7 +91,7 @@ export default function Overview({asset}) {
                 </div>
         </Row>
     </div>
-    <OverviewPanel></OverviewPanel>
+    <OverviewPanel NavigateCreateDashboard={NavigateCreateDashboard}></OverviewPanel>
     </>
   )
 }

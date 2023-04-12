@@ -6,57 +6,114 @@ import Select, {components} from "react-select";
 export default function StepThree(props) {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [parameter, setParameter] = React.useState(props.form.parameter[0]);
+  const [selectedOption, setSelectedOption] = React.useState(props.form.multiSelect)
   const varList = useSelector((state)=>state.getVariables);
   const varOptions = varList.map((element, i)=>{
       return <DropdownItem key={i} onClick = {() => {handleSetParameter(element, 'VAR')}}>{element.variableName}</DropdownItem>
-    });
-
+  });
+  
   const handleSetParameter = (element, type) => {
-    props.handleSelect(true,type,element.variableName)
-    setParameter({
-      set: 'true',
-      name: element.variableName,
-      type: type,
-    })
+    props.handleSelect(true,type,element.variableName, element.variableId)
+    setParameter(
+      {
+        set: 'true',
+        name: element.variableName,
+        type: type,
+      }
+    )
   }
   const toggle = () => setDropdownOpen((prevState) => !prevState);
-
+  
   const handleClearParameter = () => {
-    props.handleSelect(false,'','')
+    props.handleSelect(false,'','','')
     setParameter({
       set: false,
       name: '',
       type: '',
     })
   }
+  
+  const varop = varList.map((element, i)=>{
+    return {value: `${element.variableName}`, label: `${element.variableName}`, type:`VAR`, color: `#${Math.floor(Math.random()*16777215).toString(16)}`, dec: 2, alt: '', varId: `${element.variableId}`}
+  });
+
+  const handleChange = (selectedOption) => {
+    setSelectedOption(selectedOption);
+    props.handleMultiSelect(selectedOption)
+  };
+
+  const groupedOptions = [
+    {
+      label: "VAR",
+      options: varop
+    },
+    {
+      label: "KPI",
+      options: []
+    }
+  ];
 
   return (
     <div>
+      {
+        (props.form.widgetType == "Diagram" || props.form.widgetType == "Gauge")
+        ?
         <FormGroup>
-            <div> 3. Parameters </div>
-            <div> Select variable or KPI </div>
-            {parameter.set
-            ? 
-            <div className='card-param'>
-              <div className='param-name'>{parameter.name}</div>
-              <div className='param-type'>
-                <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
-                <div className={parameter.type=='VAR'?'var':'kpi'}>
-                  {parameter.type}</div>
-                </div>
-              <i className='tim-icons icon-simple-remove' onClick={() => handleClearParameter()}></i>
+            <h3 className='step-header'> 3. Parameters: </h3>
+            <div className='step-content'>
+
+            <div style={{display: "flex", alignItems: "center", columnGap: "5px"}}>
+              <div> Select variable or KPI </div>
+                <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+                <DropdownToggle caret><i style={{rotate: '90deg'}} className='tim-icons icon-triangle-right-17'></i></DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem header style={{color: 'red'}}>VAR</DropdownItem>
+                    {varOptions}
+                  <DropdownItem header style={{color: 'green'}}>KPI</DropdownItem>
+                </DropdownMenu>
+                </Dropdown>
             </div>
-            : null
-            }
-            <Dropdown isOpen={dropdownOpen} toggle={toggle}>
-            <DropdownToggle caret><i style={{rotate: '90deg'}} className='tim-icons icon-triangle-right-17'></i></DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem header style={{color: 'red'}}>VAR</DropdownItem>
-              {varOptions}
-              <DropdownItem header style={{color: 'green'}}>KPI</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+              {parameter.set
+              ? 
+              <div className='card-param'>
+                <div className='param-name'>{parameter.name}</div>
+                <div className='param-type'>
+                  <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
+                  <div className={parameter.type=='VAR'?'var':'kpi'}>
+                    {parameter.type}</div>
+                  </div>
+                <i className='tim-icons icon-simple-remove' onClick={() => handleClearParameter()}></i>
+              </div>
+              : null
+              }
+            </div>
         </FormGroup>
+        :<FormGroup>
+            <h3 className='step-header'> 3. Parameters: </h3>
+            <div className='step-content'>
+            <div> Select at least 2 variables or KPIs </div>
+            <Select
+              options={groupedOptions}
+              value={selectedOption}
+              onChange={handleChange}
+              isMulti
+            />
+              {parameter.set
+              ? 
+              <div className='card-param'>
+                <div className='param-name'>{parameter.name}</div>
+                <div className='param-type'>
+                  <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
+                  <div className={parameter.type=='VAR'?'var':'kpi'}>
+                    {parameter.type}</div>
+                  </div>
+                <i className='tim-icons icon-simple-remove' onClick={() => handleClearParameter()}></i>
+              </div>
+              : null
+              }
+            </div>
+        </FormGroup>
+        }
     </div>
   )
 }

@@ -1,0 +1,48 @@
+.dashboard{
+    position: relative;
+    form{
+        .button-groups{
+            display: flex;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 15px;
+            button[type="submit"] {
+                background: #2f61f4;
+                color: white;
+                &:hover{
+                    opacity: 1;
+                    background: #2f61f4;
+                    color: white;
+                }
+            }
+
+            button[name="cancel"] { 
+                &:hover{
+                    color: white;
+                    opacity: 1;
+                    background: #f78787;
+                }
+            }
+
+            button{
+                margin: 5px 0;
+                background: white;
+                border: 1px solid #e3e3e3;
+                padding: 10px;
+                opacity: 0.7;
+                outline: none;
+                &:hover{
+                    opacity: 1;
+                    background: #e3e3e3;
+                }
+            }
+            .button-end{
+                display: flex;
+                column-gap: 5px;
+            }
+        }
+    }
+}
