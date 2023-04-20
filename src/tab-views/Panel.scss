@@ -25,7 +25,7 @@
                 top: 0;
                 position: absolute;
                 width: 18px;
-                right: 0;
+                right: 20px;
                 margin: 4px;
                 cursor: pointer;
                 &:hover{
@@ -40,6 +40,37 @@
         }
         .edit{
             border: 2px dashed #6877fe;
+        }
+        .confirm-bg{
+            height: 100vh;
+            position: fixed;
+            z-index: 1;
+            width: 100%;
+            background: #76747438;
+            .dialog{
+                position: absolute;
+                top: 180px;
+                right: 480px;
+                padding: 44px;
+                background: white;
+                border-radius: 5px;
+                box-shadow: 2px 3px #888888;
+                button{
+                    border: none;
+                    border-radius: 5px;
+                    padding: 10px;
+                    min-width: 100px;
+                    background: #0000ffa1;
+                    color: white;
+                    font-weight: 500;
+                }
+                button[type="Yes"]{
+                    background: #0000ffa1;
+                }  
+                button[type="No"]{
+                    background: #b9b9dfa1;
+                }   
+            }
         }
         .button-header-setting{
             display: flex;

@@ -21,6 +21,28 @@
     align-items: center;
   }
 
+  .right-button{
+    padding: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 10px;
+    div{
+      font-weight: 500;
+    }
+    button{
+      opacity: 0.5;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 2px;
+      &:hover{
+        opacity: 1;
+        background: #d6d6d6;
+      }
+    }
+  }
+
   .navbar-text {
     color: $white;
   }

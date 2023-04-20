@@ -9,26 +9,35 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 import "flatpickr/dist/flatpickr.css";
 import Flatpickr from "react-flatpickr";
 import './Dashboard.scss'
+import axios from 'axios';
 
-export default React.memo(function CreateDashboard({asset}) {
+export default React.memo(function CreateDashboard({asset, assetId}) {
     const dispatch = useDispatch();
     const history = useHistory();
     const timeRangeList = useSelector(state => state.timerange);
     const [checked, setChecked] = useState(true);
     const timeRange = timeRangeList.map((element, index) => {
         return <option value={element} key={index}>{element}</option>
-    });
-
+      });
+      
     const today = new Date();
-    const handleAddDashboard = (e) => {
+    const handleAddDashboard = async (e) => {
         e.preventDefault();
         let id = uuid().slice(0,8);
-        dispatch(addDashboard({name: e.target.name.value,type: 'dashboard', 
-          timerange: e.target.timerange.value, 
-          startDate: new Date(e.target.startDate.value).toISOString(), 
-          toDate: `${checked? new Date(Date.now()).toISOString(): new Date(e.target.toDate.value).toISOString()}`, 
-          now: {checked},
-          id: id, asset: asset}));
+        const newDashboard = {
+          _id: assetId,
+          dashboards:[{
+              name: e.target.name.value,type: 'dashboard', 
+              timerange: e.target.timerange.value, 
+              startDate: new Date(e.target.startDate.value).toISOString(), 
+              toDate: `${checked? new Date(Date.now()).toISOString(): new Date(e.target.toDate.value).toISOString()}`, 
+              now: checked,
+              id: id, 
+              asset: asset
+          }]
+        }
+        await axios.post("http://localhost:4000/user/updateUser", newDashboard)
+        dispatch(addDashboard(newDashboard.dashboards[0]));
         history.push(`/admin/device/${asset}/dashboard/${id}`);
     }
     return (

@@ -25,6 +25,8 @@
     "react-chartjs-2": "3.0.4",
     "react-color": "^2.19.3",
     "react-datepicker": "^4.11.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": ">=16.8.0",
     "react-draggable": "^4.4.5",
     "react-flatpickr": "^3.10.13",
@@ -39,6 +41,7 @@
     "react-time-picker": "^5.2.0",
     "react-time-picker-input": "^2.0.10",
     "reactstrap": "8.7.1",
+    "redux-persist": "^6.0.0",
     "sass": "1.53.0",
     "sheetjs-style": "^0.15.8",
     "uuid": "^9.0.0"

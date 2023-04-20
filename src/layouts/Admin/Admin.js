@@ -25,17 +25,22 @@ import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import Footer from "components/Footer/Footer.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 import FixedPlugin from "components/FixedPlugin/FixedPlugin.js";
-
+import axios from "axios";
 import routes from "routes.js";
 
 import logo from "assets/img/react-logo.png";
 import { BackgroundColorContext } from "contexts/BackgroundColorContext";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 var ps;
 
 function Admin(props) {
   const location = useLocation();
+  const history = useHistory()
   const mainPanelRef = React.useRef(null);
+  const accessToken = useSelector(state => state.auth.login.currentUser?.accessToken);
   const [sidebarOpened, setsidebarOpened] = React.useState(
     document.documentElement.className.indexOf("nav-open") !== -1
   );
@@ -121,8 +126,20 @@ function Admin(props) {
     return "Brand";
   };
 
+  axios.interceptors.request.use((config)=> {
+    config.headers.token = `bearer ${accessToken}`;
+    return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  )
 
-  
+  useEffect(()=> {
+    if(!accessToken)
+      history.push('/login');
+  },[])
+
   return (
     <chartContext.Provider value={{chartList,dispatch}}>
     <BackgroundColorContext.Consumer>
@@ -133,7 +150,7 @@ function Admin(props) {
               routes={routes}
               logo={{
                 outterLink: "https://www.creative-tim.com/",
-                text: "a",
+                text: "Navigation",
                 imgSrc: logo
               }}
               toggleSidebar={toggleSidebar}
@@ -146,11 +163,10 @@ function Admin(props) {
               />
               <Switch>
                 {getRoutes(routes)}
-                <Redirect from="*" to="/admin/dashboard" />
+                <Redirect from="*" to="/admin/device"/>
               </Switch>
             </div>
           </div>
-          <FixedPlugin bgColor={color} handleBgClick={changeColor} />
         </React.Fragment>
       )}
       </BackgroundColorContext.Consumer>

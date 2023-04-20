@@ -5,14 +5,15 @@ import StepThree from 'components/StepProgress/StepThree';
 import StepFour from 'components/StepProgress/StepFour';
 import MultiStepProgress from 'components/StepProgress/MultiStepProgress/MultiStepProgress';
 import { Form, Button } from 'reactstrap';
-import StepFive from 'components/StepProgress/StepFive';
+import axios from 'axios';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { addWidget } from 'store';
 import { useDispatch } from 'react-redux';
+import { v4 as uuid } from 'uuid';
 import './CreateWidget.scss'
 
 
-export default function CreateWidget({asset, id}) {
+export default function CreateWidget({asset, id, assetId}) {
     const history = useHistory();
     const dispatch = useDispatch();
     const [page, setPage] = React.useState("pageone");
@@ -132,44 +133,50 @@ export default function CreateWidget({asset, id}) {
         }))
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        alert(`${form.widgetType},${asset},${id}`);
-        dispatch(addWidget({
-            asset: asset,
-            id: id,
-            widgetType: form.widgetType,
-            widgetName: form.widgetName,
-            periodNum: form.periodNum,
-            periodUnit: form.periodUnit,
-            parameter: form.parameter,
-            multiSelect: form.multiSelect,
-            alternativeLabel: form.alternativeLabel,
-            decimalNumber: form.decimalNumber,
-            color: form.color,
-            lowlimitalert: form.lowlimitalert,
-            lowlimitwarning: form.lowlimitwarning,
-            highlimitwarning: form.highlimitwarning,
-            highlimitalert: form.highlimitalert,
-            yAxisLabel: form.yAxisLabel,
-            width: `${{
-                    "Diagram":'400',
-                    "Pie": '245',
-                    "Gauge": '295',
+        let id_widget = uuid().slice(0,8);
+        const newWidget = {
+            _id: assetId,
+            widgets:[{
+                asset: asset,
+                id: id,
+                id_widget: id_widget,
+                widgetType: form.widgetType,
+                widgetName: form.widgetName,
+                periodNum: form.periodNum,
+                periodUnit: form.periodUnit,
+                parameter: form.parameter,
+                multiSelect: form.multiSelect,
+                alternativeLabel: form.alternativeLabel,
+                decimalNumber: form.decimalNumber,
+                color: form.color,
+                lowlimitalert: form.lowlimitalert,
+                lowlimitwarning: form.lowlimitwarning,
+                highlimitwarning: form.highlimitwarning,
+                highlimitalert: form.highlimitalert,
+                yAxisLabel: form.yAxisLabel,
+                width: `${{
+                        "Diagram":'400',
+                        "Pie": '245',
+                        "Gauge": '295',
 
-                }[form.widgetType]}`, 
-            height: `${{
-                "Diagram":'200',
-                "Pie": '245',
-                "Gauge": '210',
-                }[form.widgetType]}`,
-            lastX: '0',
-            lastY: '0',
-            ratio: 2,
-            UnitGauge: form.UnitGauge,
-            minRange: `${(form.minRange == '')?'0':form.minRange}`,
-            maxRange: form.maxRange,
-        }))
+                    }[form.widgetType]}`, 
+                height: `${{
+                    "Diagram":'200',
+                    "Pie": '245',
+                    "Gauge": '210',
+                    }[form.widgetType]}`,
+                lastX: '0',
+                lastY: '0',
+                ratio: 2,
+                UnitGauge: form.UnitGauge,
+                minRange: `${(form.minRange == '')?'0':form.minRange}`,
+                maxRange: form.maxRange,
+            }]
+        }
+        await axios.post("http://localhost:4000/user/addWidget", newWidget)
+        dispatch(addWidget(newWidget.widgets[0]))
         history.push(`/admin/device/${asset}/dashboard/${id}`);
     }
 

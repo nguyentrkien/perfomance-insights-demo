@@ -11,11 +11,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getDatas } from 'store';
 import XLSX from 'sheetjs-style'
 import { saveAs } from 'file-saver'
+import { deleteWidget } from 'store';
 
 
 Chart.register(StreamingPlugin);
 
-function Diagram({element, disable, size, Resize, setresizing, dashboard}) {
+function Diagram({element, disable, size, Resize, setresizing, dashboard, assetId}) {
   const dispatch = useDispatch();
   const chartReference = React.useRef(null)
   const resize = React.useRef(null)
@@ -36,10 +37,8 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard}) {
     return num*timeUnit
   }
 
-  console.log(element)
-
   useEffect(()=>{
-    dispatch(getDatas({variableId: element.parameter[0].varId, startDate: dashboard.startDate, toDate: dashboard.toDate, timeRange: getPeriod(element.periodNum, element.periodUnit)*1000}));
+    dispatch(getDatas({variableId: element.parameter[0].varId, startDate: dashboard.startDate, toDate: `${dashboard.now? new Date(Date.now()).toISOString():dashboard.toDate}`, timeRange: getPeriod(element.periodNum, element.periodUnit)*1000}));
     console.log(data);
   },[])
 
@@ -93,6 +92,15 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard}) {
     saveAs(file, fileName);
   };
 
+  const handleDelete = async () => {
+    const widget = {
+      _id: assetId,
+      id_widget: element.id_widget
+    }
+    await axios.post("http://localhost:4000/user/deleteWidget", widget)
+    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}))
+    
+  }
 
   return (
     <>
@@ -101,6 +109,10 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard}) {
       draggable="false"
       onClick={exportToExcel}
       ></img>
+    <i className='tim-icons icon-trash-simple delete' 
+      style={!disable?null:{display: 'none'}}
+      onClick={handleDelete}
+      ></i>
     {(element.parameter && (data.length != 0))
       ?<>
       <Line
@@ -135,16 +147,18 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard}) {
             },
             title: {
               align: 'center',
+              padding: 0,
               display: true,
               text: `${element.widgetName}`
             },
             subtitle: {
               display: true,
+              padding: 5,
               font: {
                 size: 8,
                 weight: 50,
               },
-              text: `${(new Date(dashboard.startDate)).toLocaleString()} - now`
+              text: `${(new Date(dashboard.startDate)).toLocaleString()} - now, period: ${element.periodNum,element.periodUnit}`
             }
           },
           scales: {

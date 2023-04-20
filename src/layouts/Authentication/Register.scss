@@ -1,0 +1,64 @@
+.background{
+    height: calc(100vh - 65px);
+    background-color: #f1acac;
+    padding: 30px 0;
+}
+
+.register {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 5px;
+    
+    .title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .form-group {
+    margin-bottom: 0px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  label.error {
+    color: red;
+  }
+  
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .toggle-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background-color: transparent;
+    color: #007bff;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+  }
+}

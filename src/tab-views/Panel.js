@@ -8,29 +8,29 @@ import PieChart from 'charts/PieChart';
 import Gauge from 'charts/Gauge'
 import Draggable from 'react-draggable';
 import { updateWidget } from 'store';
-import { getDatas } from 'store';
+import { getDatas, deleteDashboard } from 'store';
 import { StrictMode } from 'react';
+import NotificationAlert from "react-notification-alert";
 import './Panel.scss'
 import './Dashboard.scss'
+import axios from 'axios';
 
 
-export default function Panel({asset, id, dashboard}) {
+export default function Panel({asset, id, dashboard, assetId}) {
     const history = useHistory();
     const dispatch = useDispatch();
     const location = useLocation();
     const [disable, setDisable] = React.useState(true);
-    const [show, setShow] = React.useState(true)
-
-    let widgetList = useSelector(state => state.widgets);
+    const [show, setShow] = React.useState(true);
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    let widgetList = useSelector(state => state.auth.login.currentUser?.widgets);
     widgetList = widgetList.filter(element => (element.asset == asset) && (element.id == id));
-
     //day of dashboard
     // console.log(dashboard.startDate, dashboard.toDate)
     // const toDate = new Date(new Date(dashboard.startDate).getTime() + 60 * 60 * 24 * 1000);
 
     const widgets = widgetList.map((element, i) => {
-        console.log(element);
-        return <Widget element={element} disable={disable} dashboard={dashboard} key={i}></Widget>
+        return <Widget element={element} disable={disable} dashboard={dashboard} assetId={assetId} key={i}></Widget>
     })
 
     const HandleCreateWidget = () => {
@@ -44,10 +44,14 @@ export default function Panel({asset, id, dashboard}) {
 
     const confirmId = location.pathname.slice(location.pathname.lastIndexOf('/')+1, location.pathname.length);
 
-    // useEffect(()=>{
-    //     if (dataIdList.length != 0)
-    //         dispatch(getDatas({variableIdList: dataIdList, startDate: dashboard.startDate, toDate: toDate.toISOString()}));
-    // },[])
+    const handleConfirmDelete = async () => {
+        const info = {
+            "id": dashboard.id,
+            "_id": assetId,
+        }
+        dispatch(deleteDashboard(info));
+        await axios.post('http://localhost:4000/user/deleteDashboard', info);
+    }
 
   return (
     <div className='dashboard'>
@@ -62,6 +66,12 @@ export default function Panel({asset, id, dashboard}) {
             </div>
             :
             <div>
+                <Confirmation 
+                dashboard={dashboard}
+                showConfirmation={showConfirmation} 
+                setShowConfirmation={setShowConfirmation} 
+                handleConfirmDelete={handleConfirmDelete}>
+                </Confirmation>
                 <div className='button-header-setting'>
                     <div className={`new ${!show?null:'unactived'}`} onClick={HandleCreateWidget}>
                         <i className='tim-icons icon-simple-add'></i>
@@ -74,6 +84,9 @@ export default function Panel({asset, id, dashboard}) {
                     <div className={`setting ${show?null:'unactived'}`} onClick={setshow}>
                         <i className='tim-icons icon-settings-gear-63'></i>
                     </div>
+                    <div className={`setting ${show?null:'unactived'}`} onClick={e => setShowConfirmation(true)} >
+                        <i className='tim-icons icon-basket-simple'></i>
+                    </div>
                 </div>
                 <div className={`container ${show?null:'edit'}`}>
                     {widgets}
@@ -85,15 +98,34 @@ export default function Panel({asset, id, dashboard}) {
         <Switch>
             <Route 
                 path={`/admin/device/${asset}/dashboard/${id}/widget/add`}
-                render={()=><CreateWidget asset={asset} id={id}></CreateWidget>}
+                render={()=><CreateWidget asset={asset} id={id} assetId={assetId}></CreateWidget>}
                 ></Route>
         </Switch>
     </div>
   )
 }
 
-function Widget({element, disable, dashboard}) {
+function Confirmation ({dashboard, showConfirmation, setShowConfirmation, handleConfirmDelete}) {
+    return ( 
+        <>
+        {showConfirmation && (<div className='confirm-bg' onClick={() => setShowConfirmation(false)}>
+            <div className='dialog'>
+                <div>
+                <div style={{marginBottom: '5px'}}>Are you sure you want to delete <b>{dashboard.name}</b>?</div>
+                <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+                    <button type='Yes' onClick={handleConfirmDelete}>Yes</button>
+                    <button type='No' onClick={() => setShowConfirmation(false)}>No</button>
+                </div>
+                </div>
+            </div>
+        </div>)}
+        </>
+    )
+}
+
+function Widget({element, disable, dashboard, assetId}) {
     const dispatch = useDispatch();
+    const history = useHistory();
     const [resizing, setResizing] = React.useState(false);
     const [size, setSize] = React.useState({width: element.width, height: element.height})
     const position = {lastX: element.lastX, lastY: element.lastY}
@@ -125,9 +157,49 @@ function Widget({element, disable, dashboard}) {
         setResizing(bool);
     }
 
-    console.log(size)
+    const notificationAlertRef = React.useRef(null);
+    const notify = (type, message) => {
+      var options = {};
+      var icon;
+      switch(type){
+        case "warning":
+            icon = "tim-icons icon-alert-circle-exc";
+            break
+        case "danger":{
+            icon = "tim-icons icon-alert-circle-exc";
+            break
+        }
+        case "info":{
+          icon = "tim-icons icon-basket-simple";
+          break
+        }
+        case "success":{
+          icon = "tim-icons icon-check-2";
+          break
+        }
+      }
+      options = {
+        place: 'br',
+        message: (
+          <div>
+            <div>
+              {message}
+            </div>
+            <div>See Detail in Alert History Tab</div>
+          </div>
+        ),
+        type: type,
+        icon: icon,
+        autoDismiss: 7
+      };
+      notificationAlertRef.current.notificationAlert(options);
+    };
 
     return (
+        <>
+        <div className="react-notification-alert-container">
+            <NotificationAlert ref={notificationAlertRef}/>
+        </div>
         <Draggable 
             disabled={disable || resizing} 
             bounds='parent' 
@@ -145,6 +217,7 @@ function Widget({element, disable, dashboard}) {
                                 Resize={Resize} 
                                 setresizing={setresizing}
                                 dashboard={dashboard}
+                                assetId = {assetId}
                                 />,
                     "Pie": <PieChart 
                                 className='pie-chart'
@@ -154,19 +227,23 @@ function Widget({element, disable, dashboard}) {
                                 Resize={Resize} 
                                 setresizing={setresizing}
                                 dashboard={dashboard}
+                                assetId = {assetId}
                                 />,
                     "Gauge":
                             <Gauge 
-                                element={element} 
+                            element={element} 
                                 disable={disable} 
                                 size={size} 
                                 Resize={Resize} 
                                 setresizing={setresizing}
                                 dashboard={dashboard}
+                                assetId = {assetId}
+                                notify={notify}
                                 />
-                    }[element.widgetType]
-                }
+                            }[element.widgetType]
+                        }
             </div>
         </Draggable>
+        </>
     )
 }

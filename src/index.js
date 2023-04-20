@@ -21,30 +21,32 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 //Import layout
 import AdminLayout from "layouts/Admin/Admin.js";
-import RTLLayout from "layouts/RTL/RTL.js";
+import Login from "layouts/Authentication/Login";
 
 import "assets/scss/black-dashboard-react.scss";
 import "assets/demo/demo.css";
 import "assets/css/nucleo-icons.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-
-import { StrictMode } from "react";
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
 import { Provider } from "react-redux";
-import { State } from "store";
+import { PersistGate } from "redux-persist/integration/react";
+import { State, persistor } from "store";
+import Register from "layouts/Authentication/Register";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
     <Provider store={State}>
+      <PersistGate loading={null} persistor={persistor}></PersistGate>
     <ThemeContextWrapper>
       <BackgroundColorWrapper>
         <BrowserRouter>
           <Switch>
             <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-            <Route path="/rtl" render={(props) => <RTLLayout {...props} />} />
-            <Redirect from="/" to="/admin/dashboard" />
+            <Route path="/login" render={(props) => <Login {...props} />} />
+            <Route path="/register" render={(props) => <Register {...props} />} />
+            <Redirect from="/" to="/login" />
           </Switch>
         </BrowserRouter>
       </BackgroundColorWrapper>

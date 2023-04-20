@@ -21,14 +21,6 @@ import classNames from "classnames";
 
 // reactstrap components
 import {
-  Button,
-  Collapse,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  Input,
-  InputGroup,
   NavbarBrand,
   Navbar,
   NavLink,
@@ -38,8 +30,14 @@ import {
   NavbarToggler,
   ModalHeader
 } from "reactstrap";
+import { logoutUser } from "store/auth";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useDispatch, useSelector } from "react-redux";
 
 function AdminNavbar(props) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const name = useSelector(state => state.auth.login.currentUser?.name)
   const [collapseOpen, setcollapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
   const [color, setcolor] = React.useState("navbar-transparent");
@@ -85,11 +83,18 @@ function AdminNavbar(props) {
                 <span className="navbar-toggler-bar bar1" />
                 <span className="navbar-toggler-bar bar2" />
                 <span className="navbar-toggler-bar bar3" />
-              </NavbarToggler>
+              </NavbarToggler>  
             </div>
             <NavbarBrand href="#pablo" onClick={(e) => e.preventDefault()}>
               {props.brandText}
             </NavbarBrand>
+          </div>
+          <div className="right-button">
+            <div>
+              Hi, {name}
+            </div>
+            <button onClick={(e)=> logoutUser(history, dispatch)}> Logout </button>
+              
           </div>
         </Container>
       </Navbar>

@@ -14,7 +14,7 @@ import './Dashboard.scss'
 
 export default function Overview({asset}) {
     const history = useHistory();
-    const dashboards = useSelector(state => state.dashboards)
+    const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
     const NavigateCreateDashboard = () => {
       history.push(`/admin/device/${asset}/dashboard/add`)
     }

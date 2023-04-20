@@ -5,8 +5,6 @@ import {
   ButtonGroup,
   Row,
 } from "reactstrap";
-import { Redirect } from 'react-router-dom';
-import Charts from './OverviewPanel';
 import { useHistory, Switch, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom/cjs/react-router-dom';
@@ -15,15 +13,17 @@ import OverviewIcon from '../assets/icon/overview.png'
 import DeviceIcon from '../assets/icon/device.png';
 import './Dashboard.scss'
 
-export default function DashboardE({asset, id}) {
+export default function DashboardE({asset, id, assetId}) {
     const history = useHistory();
     const location = useLocation();
-    const dashboards = useSelector(state => state.dashboards)
-    const dashboardSelected = location.pathname.slice(location.pathname.lastIndexOf('/')+1, location.pathname.length)
-    console.log(dashboards)
+    const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
+    const dashboardSelected = location.pathname.slice(location.pathname.lastIndexOf('dashboard/')+10, location.pathname.lastIndexOf('dashboard/')+18)
     const NavigateCreateDashboard = () => {
       history.push(`/admin/device/${asset}/dashboard/add`)
     }
+
+    console.log(dashboardSelected)
+
     const buttonDashboards = dashboards.map((element,index)=> {
       return (
       <>
@@ -106,9 +106,9 @@ export default function DashboardE({asset, id}) {
     {
       dashboards.map((dashboard) => {
         if (dashboard.id == dashboardSelected)
-        return (
-          <Panel asset={asset} id={id} dashboard={dashboard}></Panel>
-        )
+          return (
+            <Panel asset={asset} id={id} dashboard={dashboard} assetId={assetId}></Panel>
+            )
       })
     }
     </>

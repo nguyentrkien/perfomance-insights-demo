@@ -1,21 +1,39 @@
 import axios from "axios"
 import { createAsyncThunk, createSlice, configureStore, current } from "@reduxjs/toolkit"
+import { combineReducers } from '@reduxjs/toolkit';
+import {
+    persistStore,
+    persistReducer,
+    FLUSH,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+  } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import { elementType } from "prop-types";
 
 const initialState = {
     getVariables: [],
     getDatas: [],
     getAssets: [],
     isGetAssets: false,
-    dashboards: [
-        {name: 'overview', type: 'overview', asset: 'edge', id: 'overview'},
-        {name: 'add', type: 'add', asset: 'edge', id: 'add'},
-    ],
+    // dashboards: [
+    //     {name: 'overview', type: 'overview', asset: 'edge', id: 'overview'},
+    //     {name: 'add', type: 'add', asset: 'edge', id: 'add'},
+    // ],
     timerange: ['day','month','year'],
     period: ['minute','hour','day'],
     Aggregation: ['Average','Max','Min','Sum'],
-    widgets: [],
     singleData: '',
     getInitData: false,
+    auth: {
+        login: {
+            currentUser: {},
+        }
+    },
+    historyAlert: [],
 }
 
 export const getVar = createAsyncThunk("State/getVar",
@@ -31,6 +49,7 @@ export const getAssets = createAsyncThunk("State/getAssets",
         return assets
     }
 )
+
 
 export const getDatas = createAsyncThunk("State/getDatas",
     async ({variableId, startDate, toDate, timeRange}) => {
@@ -74,11 +93,11 @@ const StateSlice = createSlice({
     name: "AppState",
     initialState,
     reducers: {
-        addDashboard: (state, action) => {state.dashboards.push(action.payload); return state},
-        addWidget: (state, action) => {state.widgets.push(action.payload); return state},
+        addDashboard: (state, action) => {state.auth.login.currentUser.dashboards.push(action.payload); return state},
+        addWidget: (state, action) => {state.auth.login.currentUser.widgets.push(action.payload); return state},
         updateWidget: (state, action) => {
-            const updateState = current(state.widgets).map((element) => {
-                if ((element.asset == action.payload.asset) && (element.id == action.payload.id)){
+            const updateState = current(state.auth.login.currentUser.widgets).map((element) => {
+                if ((element.asset == action.payload.asset) && (element.id == action.payload.id) && (element.id_widget == action.payload.id_widget)){
                     if (action.payload.type == 'resize')
                         return {
                             ...element,
@@ -97,12 +116,33 @@ const StateSlice = createSlice({
                 else
                     return element
             }); 
-            return {
-                ...state,
-                widgets: updateState,
-            }
+            state.auth.login.currentUser.widgets = updateState;
         },
-        deleteDashboard: (state, action) => {state.dashboards = ['0']; return state},
+        deleteWidget: (state, action) => {
+            const updateState = current(state.auth.login.currentUser.widgets).filter((element) => 
+                ((element.id != action.payload.id) || (element.id_widget != action.payload.id_widget))) 
+            if (updateState[0] == undefined)
+                state.auth.login.currentUser.widgets = [];
+            else 
+                state.auth.login.currentUser.widgets = updateState;
+
+        },
+        deleteDashboard: (state, action) => {
+            const updateStateDashboards = current(state.auth.login.currentUser.dashboards).filter((element) => (element.id != action.payload.id)) 
+            const updateStateWidgets = current(state.auth.login.currentUser.widgets).filter((element) => (element.id != action.payload.id)) 
+            state.auth.login.currentUser.dashboards = updateStateDashboards;
+            state.auth.login.currentUser.widgets = updateStateWidgets;
+        },
+        loginSuccess: (state, action) => {state.auth.login.currentUser = action.payload; return state},
+        logoutSuccess: (state, action) => {state.auth.login.currentUser = null; return state},
+        addHistoryAlert: (state, action) => {state.historyAlert.push(action.payload); return state},
+        removeHistoryAlert: (state, action) => {
+            const updateState = current(state.historyAlert).filter((element) => ((element.id != action.payload.id))); 
+            if (updateState[0] == undefined)
+                state.historyAlert = [];
+            else 
+                state.historyAlert = updateState;
+        },
     },
     extraReducers: (builder) =>{
         builder.addCase(getVar.fulfilled,(state,action)=> {
@@ -121,9 +161,30 @@ const StateSlice = createSlice({
             state.singleData = action.payload[0].values[0].value;
             state.getInitData = true;
         })
+        builder.addCase(PURGE, (state) => {
+            initialState.removeAll(state);
+        });
     },
 }) 
-export const {addDashboard, deleteDashboard, addWidget, updateWidget} = StateSlice.actions;
+
+const persistConfig = {
+    key: 'root',
+    version: 1,
+    storage,
+  }
+// const rootReducer = combineReducers({all: StateSlice.reducer})
+const persistedReducer = persistReducer(persistConfig, StateSlice.reducer)
+
+export const {addDashboard, deleteDashboard, addWidget, updateWidget, deleteWidget, loginSuccess, logoutSuccess, addHistoryAlert, removeHistoryAlert} = StateSlice.actions;
 export const State = configureStore({
-    reducer: StateSlice.reducer
+    // reducer: StateSlice.reducer,
+    reducer: persistedReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+    }),
 })
+  
+export let persistor = persistStore(State);

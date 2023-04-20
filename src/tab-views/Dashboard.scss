@@ -23,7 +23,11 @@
 }
 
 .header-dashboard{
+    .btn{
+        padding: 5px 10px !important;
+    }
     .title{
+        text-align: start !important;
         margin: 10px 0px;
         padding: 0 15px;
     }
@@ -101,6 +105,14 @@
                 select{
                     width: 100px;
                 }
+            }
+            .formula{
+                position: relative;
+            }
+            .input-formula{
+                width: 100%;
+                min-height: 100px;
+                border: 1px solid gray;
             }
             .date-setting{
                 display: flex;

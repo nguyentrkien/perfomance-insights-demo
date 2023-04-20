@@ -9,10 +9,11 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSingleData } from 'store';
 import './chart.scss'
+import { deleteWidget } from 'store';
 
 Chart.register(StreamingPlugin);
 
-function PieChart({element, disable, size, Resize, setresizing, dashboard}) {
+function PieChart({element, disable, size, Resize, setresizing, dashboard, assetId}) {
   const dispatch = useDispatch();
   const chartReference = React.useRef(null)
   const resize = React.useRef(null)
@@ -102,13 +103,28 @@ function PieChart({element, disable, size, Resize, setresizing, dashboard}) {
     getData()
       .then((data) =>{setInitData(data)})
     setIsGetData(prev=>!prev)
-    },[])
+  },[])
+
+  const handleDelete = async () => {
+    const widget = {
+      _id: assetId,
+      id_widget: element.id_widget
+    }
+    console.log(assetId,element.id_widget)
+    await axios.post("http://localhost:4000/user/deleteWidget", widget)
+    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}))
+    
+  }
 
 
   return (
     <div className='pie-chart'>
       {isGetData
       ?<>
+      <i className='tim-icons icon-trash-simple delete' 
+      style={!disable?null:{display: 'none'}}
+      onClick={handleDelete}
+      ></i>
       <Pie 
       ref={chartReference}
       data={{

@@ -1,0 +1,10 @@
+i.delete{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0.5;
+    cursor: pointer;
+    &:hover{
+        opacity: 1;
+    }
+}

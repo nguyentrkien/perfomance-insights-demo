@@ -20,6 +20,7 @@ import { saveAs } from 'file-saver'
 import axios from 'axios';
 import element from "chartjs-plugin-annotations/src/element";
 import Logo from '../assets/img/ThanhThienlogo.png'
+import exportIcon from '../assets/img/export.png'
 
 function Export () {
     const [checked, setChecked] = useState(true);

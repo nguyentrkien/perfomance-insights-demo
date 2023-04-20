@@ -7,12 +7,13 @@ import axios from 'axios';
 import 'chartjs-plugin-datalabels';
 import 'chartjs-plugin-annotations';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSingleData } from 'store';
+import { getSingleData, deleteWidget, addHistoryAlert } from 'store';
+import { v4 as uuid } from 'uuid';
 import './chart.scss'
 
 Chart.register(StreamingPlugin);
 
-function Gauge({element, disable, size, Resize, setresizing, dashboard}) {
+function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId, notify}) {
   const dispatch = useDispatch();
   const chartReference = React.useRef(null)
   const resize = React.useRef(null)
@@ -21,7 +22,7 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard}) {
   const [initData,setInitData] = React.useState([]);
   const [initNeedle,setInitNeedle] = React.useState();
   const [data, setData] = React.useState();
-
+   
   //calculate period
   const getPeriod = (num, unit) => {
     let timeUnit
@@ -114,9 +115,68 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard}) {
     const interval = setInterval(() => {
       const chart = chartReference.current;
       getData()
-          .then((data) =>{setData(data)})
-      chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
-      chart.update();
+        .then((data) =>{
+          if (data <= element.lowlimitalert)
+          {
+            console.log('alert')
+            notify("alert","Threshold Crossing Alert")
+            let id = uuid().slice(0,8);
+            dispatch(addHistoryAlert({
+              id: id,
+              parameter: element.parameter[0].name,
+              type: element.parameter[0].type,
+              alertType: 'Alert',
+              value: data.toFixed(element.decimalNumber),
+              date: (new Date(Date.now())).toLocaleString()
+            }))
+          }
+          else if ((data >= element.lowlimitalert) && ((data <= element.lowlimitwarning)))
+          {
+            console.log('warning')
+            let id = uuid().slice(0,8);
+            notify("warning","Threshold Crossing Warning");
+            dispatch(addHistoryAlert({
+              id: id,
+              parameter: element.parameter[0].name,
+              type: element.parameter[0].type,
+              alertType: 'Warning',
+              value: data.toFixed(element.decimalNumber),
+              date: (new Date(Date.now())).toLocaleString()
+            }))
+          }
+          else if ((data >= element.highlimitwarning) && ((data <= element.highlimitalert)))
+          {
+            console.log('warning')
+            let id = uuid().slice(0,8);
+            notify("warning","Threshold Crossing Warning")
+            dispatch(addHistoryAlert({
+              id: id,
+              parameter: element.parameter[0].name,
+              type: element.parameter[0].type,
+              alertType: 'Warning',
+              value: data.toFixed(element.decimalNumber),
+              date: (new Date(Date.now())).toLocaleString()
+            }))
+          }
+          else if (data >= element.highlimitalert)
+          {
+            console.log('alert')
+            notify("danger","Threshold Crossing Alert")
+            let id = uuid().slice(0,8);
+            dispatch(addHistoryAlert({
+              id: id,
+              parameter: element.parameter[0].name,
+              type: element.parameter[0].type,
+              alertType: 'Alert',
+              value: data.toFixed(element.decimalNumber),
+              date: (new Date(Date.now())).toLocaleString()
+            }))
+          }
+          chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
+          chart.update();
+        })
+      // chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
+      // console.log(data)
     }, getPeriod(element.periodNum, element.periodUnit)*1000);
     return () => clearInterval(interval);
     },[])
@@ -131,7 +191,7 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard}) {
         afterDraw: chart => {
           var needleValue = chart.config.data.datasets[0].needleValue;
           var dataTotal = chart.config.data.datasets[0].data.reduce((a, b) => a + b, 0);
-          var angle = Math.PI + (1 / dataTotal * needleValue * Math.PI);
+          var angle = Math.PI + (1 / dataTotal * (needleValue - element.minRange) * Math.PI);
           var ctx = chart.ctx;
           var cw = chart.canvas.offsetWidth;
           var ch = chart.canvas.offsetHeight;
@@ -217,9 +277,24 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard}) {
       }
   };
 
+  const handleDelete = async () => {
+    const widget = {
+      _id: assetId,
+      id_widget: element.id_widget
+    }
+    console.log(assetId,element.id_widget)
+    await axios.post("http://localhost:4000/user/deleteWidget", widget)
+    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}))
+    
+  }
+
   return (
     <div>
       <Doughnut ref={chartReference} plugins={options.plugins} data={options.data} options={options.options} />
+      <i className='tim-icons icon-trash-simple delete' 
+      style={!disable?null:{display: 'none'}}
+      onClick={handleDelete}
+      ></i>
       <img className='resize-button' 
       src={ResizeIcon} 
       ref={resize}

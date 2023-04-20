@@ -29,11 +29,13 @@ import { getAssets } from "store";
 import {
   Nav
 } from "reactstrap";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 
 function Device(props) {
   const location = useLocation();
   const dispatch = useDispatch();
+  const history = useHistory();
   const [select, setSelect] = useState(null);
   const assets = useSelector((state)=> state.getAssets);
   const isGetAssets = useSelector((state)=> state.isGetAssets);

@@ -15,8 +15,6 @@ import classNames from "classnames";
 import Alarm from "tab-views/Alarm";
 import Overview from "tab-views/Overview";
 import { NavLink, Redirect, Route, Switch } from "react-router-dom";
-
-import NotificationAlert from "react-notification-alert";
 import { useHistory, useLocation } from "react-router-dom";
 // reactstrap components
 
@@ -27,47 +25,13 @@ import DashboardE from "tab-views/DashboardE";
 
 
 function Dashboard({asset}) {
-  const location = useLocation();
   const dispatch = useDispatch();
   const history = useHistory();
-  const dashboards = useSelector((state) => state.dashboards);
+  const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
+  const _id = useSelector(state => state.auth.login.currentUser?._id);
 
-  const notificationAlertRef = React.useRef(null);
-  const notify = (type, message) => {
-    var options = {};
-    var icon;
-    switch(type){
-      case "warning":
-      case "danger":{
-        icon = "tim-icons icon-alert-circle-exc";
-        break
-      }
-      case "info":{
-        icon = "tim-icons icon-basket-simple";
-        break
-      }
-      case "success":{
-        icon = "tim-icons icon-check-2";
-        break
-      }
-    }
-    options = {
-      place: 'br',
-      message: (
-        <div>
-          <div>
-            {message}
-          </div>
-        </div>
-      ),
-      type: type,
-      icon: icon,
-      autoDismiss: 7
-    };
-    notificationAlertRef.current.notificationAlert(options);
-  };
   const getRoutes = (dashboards) => {
-    return dashboards.map((prop, i) => {
+    return dashboards?.map((prop, i) => {
         return (
           <Route
             path={`/admin/device/${prop.asset}/dashboard/` + prop.id}
@@ -76,13 +40,13 @@ function Dashboard({asset}) {
                 case 'overview':
                   return (<Overview asset={prop.asset}></Overview>)
                 case 'add':
-                  return (<CreateDashboard asset={prop.asset}></CreateDashboard>)
+                  return (<CreateDashboard asset={prop.asset} assetId={_id}></CreateDashboard>)
                 case 'dashboard':
-                  return (<DashboardE asset={prop.asset} id={prop.id}></DashboardE>)
+                  return (<DashboardE asset={prop.asset} id={prop.id} assetId={_id}></DashboardE>)
                     }
                   }
                 }
-                key={i}
+            key={i}
                 />
         );
     });
@@ -95,9 +59,6 @@ function Dashboard({asset}) {
 
   return (
       <div className="content">
-        <div className="react-notification-alert-container">
-          <NotificationAlert ref={notificationAlertRef}/>
-        </div>
         <Switch>
           {getRoutes(dashboards)}
           <Redirect from="*" to={`/admin/device/${asset}/dashboard/overview`}></Redirect>
