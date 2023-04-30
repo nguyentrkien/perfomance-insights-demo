@@ -95,6 +95,7 @@ const StateSlice = createSlice({
     reducers: {
         addDashboard: (state, action) => {state.auth.login.currentUser.dashboards.push(action.payload); return state},
         addWidget: (state, action) => {state.auth.login.currentUser.widgets.push(action.payload); return state},
+        addKpi: (state, action) => {state.auth.login.currentUser.kpis.push(action.payload); return state},
         updateWidget: (state, action) => {
             const updateState = current(state.auth.login.currentUser.widgets).map((element) => {
                 if ((element.asset == action.payload.asset) && (element.id == action.payload.id) && (element.id_widget == action.payload.id_widget)){
@@ -143,6 +144,13 @@ const StateSlice = createSlice({
             else 
                 state.historyAlert = updateState;
         },
+        removeKpi: (state, action) => {
+            const updateState = current(state.auth.login.currentUser.kpis).filter((element) => ((element.id != action.payload.id))); 
+            if (updateState[0] == undefined)
+                state.auth.login.currentUser.kpis = [];
+            else 
+                state.auth.login.currentUser.kpis = updateState;
+        },
     },
     extraReducers: (builder) =>{
         builder.addCase(getVar.fulfilled,(state,action)=> {
@@ -175,7 +183,20 @@ const persistConfig = {
 // const rootReducer = combineReducers({all: StateSlice.reducer})
 const persistedReducer = persistReducer(persistConfig, StateSlice.reducer)
 
-export const {addDashboard, deleteDashboard, addWidget, updateWidget, deleteWidget, loginSuccess, logoutSuccess, addHistoryAlert, removeHistoryAlert} = StateSlice.actions;
+export const {
+        addDashboard, 
+        deleteDashboard, 
+        addWidget, 
+        addKpi, 
+        updateWidget, 
+        deleteWidget, 
+        loginSuccess, 
+        logoutSuccess, 
+        addHistoryAlert, 
+        removeHistoryAlert,
+        removeKpi
+    } 
+    = StateSlice.actions;
 export const State = configureStore({
     // reducer: StateSlice.reducer,
     reducer: persistedReducer,

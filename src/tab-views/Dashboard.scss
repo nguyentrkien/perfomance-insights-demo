@@ -108,11 +108,19 @@
             }
             .formula{
                 position: relative;
+                .formula-header{
+                    border: 1px solid gray;
+                    background: #f0eeee;
+                    padding: 10px;
+                    font-weight: bold;
+                }
             }
             .input-formula{
                 width: 100%;
                 min-height: 100px;
                 border: 1px solid gray;
+                background: #58555571;
+                padding: 5px;
             }
             .date-setting{
                 display: flex;

@@ -85,7 +85,9 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
   
   //async function fetch data
   const getData = async () => {
-    var dataRequest = JSON.stringify({
+    if (element.parameter[0].type == 'VAR')
+    {
+      var dataRequest = JSON.stringify({
         "from": `${new Date(Date.now()-getPeriod(element.periodNum, element.periodUnit)*1000).toISOString()}`,
         "to": `${new Date(Date.now()).toISOString()}`,
         "calculationTimeRange": getPeriod(element.periodNum, element.periodUnit)*1000,
@@ -98,16 +100,47 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
         ]
       });
       
-    var config = {
-        method: 'post',
-        url: 'http://localhost:4000/CalculateTrend',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        data : dataRequest
-      };
-    var {data} = await axios(config);
-    return data[0].values[0].value
+      var config = {
+          method: 'post',
+          url: 'http://localhost:4000/CalculateTrend',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          data : dataRequest
+        };
+      var {data} = await axios(config);
+      return data[0].values[0].value
+    }
+    else {
+      const listData = await Promise.all(element.parameter[0].listVar.map( async (item)=>{
+        var dataRequest = JSON.stringify({
+          "from": `${new Date(Date.now()-getPeriod(element.periodNum, element.periodUnit)*1000).toISOString()}`,
+          "to": `${new Date(Date.now()).toISOString()}`,
+          "calculationTimeRange": getPeriod(element.periodNum, element.periodUnit)*1000,
+          "dataSources": [
+            {
+              "id": `${item.varId}`,
+              "type": "Variable",
+              "aggregation": "Average"
+            }
+          ]
+        });
+        
+        var config = {
+            method: 'post',
+            url: 'http://localhost:4000/CalculateTrend',
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            data : dataRequest
+          };
+        var {data} = await axios(config);
+        return data[0].values[0].value
+      }))
+      const calculateKPI = new Function(...element.parameter[0].listVar.map((item) => item.text), `return ${element.parameter[0].formula}`)
+      return calculateKPI(...listData)
+
+    }
   }
     
   //setInterval

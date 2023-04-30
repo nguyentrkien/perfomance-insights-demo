@@ -26,7 +26,9 @@ export default function CreateWidget({asset, id, assetId}) {
             set: false,
             name: '',
             varId: '',
-            type: ''
+            type: '',
+            listVar: [],
+            formula: '',
           }],
         multiSelect: [],
         alternativeLabel: '',
@@ -98,17 +100,33 @@ export default function CreateWidget({asset, id, assetId}) {
         }))
     }
 
-    const handleSelectParam = (set, type, name, varId) => {
-        let updateValue = {parameter: [{
-            set: set,
-            name: name,
-            varId: varId,
-            type: type
-          }]}
-        setForm(form => ({
-            ...form,
-            ...updateValue
-        }))
+    const handleSelectParam = (set, type, name, varId, formula) => {
+        if (type == 'VAR'){
+            let updateValue = {parameter: [{
+                set: set,
+                name: name,
+                varId: varId,
+                type: type
+            }]}
+            setForm(form => ({
+                ...form,
+                ...updateValue
+            }))
+        }
+        else {
+            let updateValue = {parameter: [{
+                set: set,
+                name: name,
+                listVar: varId,
+                type: type,
+                formula: formula,
+            }]}
+            setForm(form => ({
+                ...form,
+                ...updateValue
+            }))
+        }
+        
     }
 
     const handleMultiSelect = (selectedOption) => {

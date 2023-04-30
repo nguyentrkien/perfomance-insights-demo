@@ -2,13 +2,19 @@ import React from 'react'
 import { FormGroup, Row, Col, Input, Dropdown, DropdownMenu, DropdownItem, DropdownToggle } from 'reactstrap'
 import { CirclePicker } from 'react-color';
 import {Progress} from 'reactstrap';
+import Switch from '@mui/material/Switch';
 import './Step.scss'
 
 export default function StepFour(props) {
   const parameter = props.form.parameter[0];
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [dropdownOpenList, setDropdownOpenList] = React.useState([false, false]);
+  const [isChecked, setIsChecked] = React.useState(false);
 
+  const handleChange = (event) => {
+    setIsChecked(event.target.checked);
+    console.log(isChecked);
+  };
   const [color, setColor] = React.useState(props.form.color)
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const handleChangeComplete = (e) => {
@@ -105,35 +111,45 @@ export default function StepFour(props) {
             </div>
 
             <div className='warning-setting'>
-              <Row>
-                  <div className="limit_values">
-                    <div className="input_limit_value">
-                      <div>Low limit alert:</div>
-                      <Input type="number" step="0.01" name='lowlimitalert' value={props.form.lowlimitalert} onChange={props.handleChange} required ></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>Low limit warning:</div>
-                      <Input type="number" step="0.01" name='lowlimitwarning' value={props.form.lowlimitwarning} onChange={props.handleChange} required></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>High limit warning:</div>
-                      <Input type="number" step="0.01" name='highlimitwarning' value={props.form.highlimitwarning} onChange={props.handleChange} required></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>High limit alert:</div>
-                      <Input type="number" step="0.01" name='highlimitalert' value={props.form.highlimitalert} onChange={props.handleChange} required></Input>
-                    </div> 
-                  </div>
-              </Row>
-              <Row>
-                <Progress multi>
-                        <Progress bar color="danger" value="20">Alert</Progress>
-                        <Progress bar color="warning" value="20">Warning</Progress>
-                        <Progress bar color="white" value="20" style={{color: "black"}}>OK</Progress>
-                        <Progress bar color="warning" value="20">Warning</Progress>
-                        <Progress bar color="danger" value="20">Alert</Progress>
-                </Progress>
-              </Row>
+              <div className='bold' style={{margin: '0 20px'}}>Warning
+                <Switch
+                  checked={isChecked}
+                  onChange={handleChange}
+                />
+              </div>
+              {isChecked
+              ?<div>
+                <Row>
+                    <div className="limit_values">
+                      <div className="input_limit_value">
+                        <div>Low limit alert:</div>
+                        <Input type="number" step="0.01" name='lowlimitalert' value={props.form.lowlimitalert} onChange={props.handleChange} required ></Input>
+                      </div> 
+                      <div className="input_limit_value">
+                        <div>Low limit warning:</div>
+                        <Input type="number" step="0.01" name='lowlimitwarning' value={props.form.lowlimitwarning} onChange={props.handleChange} required></Input>
+                      </div> 
+                      <div className="input_limit_value">
+                        <div>High limit warning:</div>
+                        <Input type="number" step="0.01" name='highlimitwarning' value={props.form.highlimitwarning} onChange={props.handleChange} required></Input>
+                      </div> 
+                      <div className="input_limit_value">
+                        <div>High limit alert:</div>
+                        <Input type="number" step="0.01" name='highlimitalert' value={props.form.highlimitalert} onChange={props.handleChange} required></Input>
+                      </div> 
+                    </div>
+                </Row>
+                <Row>
+                  <Progress multi>
+                          <Progress bar color="danger" value="20">Alert</Progress>
+                          <Progress bar color="warning" value="20">Warning</Progress>
+                          <Progress bar color="white" value="20" style={{color: "black"}}>OK</Progress>
+                          <Progress bar color="warning" value="20">Warning</Progress>
+                          <Progress bar color="danger" value="20">Alert</Progress>
+                  </Progress>
+                </Row>
+              </div>
+              :<></>}
             </div>
           </div>
           <div className='card-param'>
@@ -196,6 +212,7 @@ export default function StepFour(props) {
             </div>
 
             <div className='warning-setting'>
+              <div className='bold'>Warning: </div>
               <Row>
                   <div className="limit_values" style={{margin: '0px'}}>
                   <div className="input_limit_value">
@@ -243,3 +260,6 @@ export default function StepFour(props) {
     </>
   )
 }
+
+
+

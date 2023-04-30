@@ -98,8 +98,67 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
       id_widget: element.id_widget
     }
     await axios.post("http://localhost:4000/user/deleteWidget", widget)
-    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}))
-    
+    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget})) 
+  }
+
+  const getData = async () => {
+    if (element.parameter[0].type == 'VAR')
+    {
+      var dataRequest = JSON.stringify({
+        "from": `${new Date(Date.now()-getPeriod(element.periodNum, element.periodUnit)*1000).toISOString()}`,
+        "to": `${new Date(Date.now()).toISOString()}`,
+        "calculationTimeRange": getPeriod(element.periodNum, element.periodUnit)*1000,
+        "dataSources": [
+          {
+            "id": `${element.parameter[0].varId}`,
+            "type": "Variable",
+            "aggregation": "Average"
+          }
+        ]
+      });
+      
+      var config = {
+          method: 'post',
+          url: 'http://localhost:4000/CalculateTrend',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          data : dataRequest
+        };
+      var {data} = await axios(config);
+      console.log(data)
+      return data[0].values[0].value
+    }
+    else {
+      const listData = await Promise.all(element.parameter[0].listVar.map( async (item)=>{
+        var dataRequest = JSON.stringify({
+          "from": `${new Date(Date.now()-getPeriod(element.periodNum, element.periodUnit)*1000).toISOString()}`,
+          "to": `${new Date(Date.now()).toISOString()}`,
+          "calculationTimeRange": getPeriod(element.periodNum, element.periodUnit)*1000,
+          "dataSources": [
+            {
+              "id": `${item.varId}`,
+              "type": "Variable",
+              "aggregation": "Average"
+            }
+          ]
+        });
+        
+        var config = {
+            method: 'post',
+            url: 'http://localhost:4000/CalculateTrend',
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            data : dataRequest
+          };
+        var {data} = await axios(config);
+        return data[0].values[0].value
+      }))
+      const calculateKPI = new Function(...element.parameter[0].listVar.map((item) => item.text), `return ${element.parameter[0].formula}`)
+      return calculateKPI(...listData)
+
+    }
   }
 
   return (
@@ -170,12 +229,14 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
                   duration: ((new Date(dashboard.toDate)).getTime()-(new Date(dashboard.startDate)).getTime() + 10000*100), //1day  
                   refresh: getPeriod(element.periodNum, element.periodUnit)*1000,
                   onRefresh: chart => {
-                    let a = Math.random();
-                    chart.data.datasets[0].data.push({
-                      x: (Date.now()),
-                      y: a.toFixed(element.decimalNumber),
-                    });
-                  }
+                    getData()
+                      .then((data) => {
+                        chart.data.datasets[0].data.push({
+                          x: (Date.now()),
+                          y: data.toFixed(element.decimalNumber),
+                        });
+                      })
+                    }
               },
             },
             y: {

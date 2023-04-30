@@ -32,6 +32,8 @@ import BackgroundColorWrapper from "./components/BackgroundColorWrapper/Backgrou
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { State, persistor } from "store";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import Register from "layouts/Authentication/Register";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -39,6 +41,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <Provider store={State}>
       <PersistGate loading={null} persistor={persistor}></PersistGate>
+    <DndProvider backend={HTML5Backend}>
     <ThemeContextWrapper>
       <BackgroundColorWrapper>
         <BrowserRouter>
@@ -51,5 +54,6 @@ root.render(
         </BrowserRouter>
       </BackgroundColorWrapper>
     </ThemeContextWrapper>
+    </DndProvider>
     </Provider>
 );

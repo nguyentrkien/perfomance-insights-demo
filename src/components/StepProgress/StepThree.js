@@ -11,16 +11,43 @@ export default function StepThree(props) {
   const varOptions = varList.map((element, i)=>{
       return <DropdownItem key={i} onClick = {() => {handleSetParameter(element, 'VAR')}}>{element.variableName}</DropdownItem>
   });
+
+  const kpiList = useSelector((state)=>state.auth.login.currentUser?.kpis);
+  const kpiOptions = kpiList.map((element, i)=>{
+      return <DropdownItem key={i} onClick = {() => {handleSetParameter(element, 'KPI')}}>{element.name}</DropdownItem>
+  });
   
   const handleSetParameter = (element, type) => {
-    props.handleSelect(true,type,element.variableName, element.variableId)
-    setParameter(
-      {
+    if (type == 'VAR')
+    {
+      setParameter({
         set: 'true',
         name: element.variableName,
         type: type,
-      }
-    )
+      })
+      props.handleSelect(true,type,element.variableName, element.variableId)
+    }
+    else if (type == 'KPI')
+    {
+      setParameter({
+        set: 'true',
+        name: element.name,
+        type: type,
+      })
+      const listVar = element.formula.filter((e)=> {
+        if (e.type == 'Param')
+          return e.varId
+      })
+      const formula = element.formula.reduce((chain, current)=> {
+        if (current.type == 'operator')
+          return chain + current.operator
+        else if (current.type == 'Param')
+          return chain + current.text
+      },'')
+      props.handleSelect(true,type,element.name, listVar, formula)
+      console.log(formula)
+    }
+
   }
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   
@@ -70,6 +97,7 @@ export default function StepThree(props) {
                   <DropdownItem header style={{color: 'red'}}>VAR</DropdownItem>
                     {varOptions}
                   <DropdownItem header style={{color: 'green'}}>KPI</DropdownItem>
+                    {kpiOptions}
                 </DropdownMenu>
                 </Dropdown>
             </div>
