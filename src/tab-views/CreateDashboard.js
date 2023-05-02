@@ -36,7 +36,7 @@ export default React.memo(function CreateDashboard({asset, assetId}) {
               asset: asset
           }]
         }
-        await axios.post("http://localhost:4000/user/updateUser", newDashboard)
+        // await axios.post("http://localhost:4000/user/updateUser", newDashboard)
         dispatch(addDashboard(newDashboard.dashboards[0]));
         history.push(`/admin/device/${asset}/dashboard/${id}`);
     }

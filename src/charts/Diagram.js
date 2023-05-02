@@ -25,10 +25,10 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
   const getPeriod = (num, unit) => {
     let timeUnit
     switch (unit){
-      case "Hour(s)":
+      case "Hour":
         timeUnit = 3600;
         break
-      case "Minute(s)":
+      case "Minute":
         timeUnit = 60;
         break
       default:
@@ -82,23 +82,28 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
     const data = chart.data.datasets[0].data.map((e,i)=>{
       return {Date: new Date(e.x).toLocaleString(),Value: e.y}
     });
-  
+    const wscols = [
+      {wch:25},
+    ];
     const worksheet = XLSX.utils.json_to_sheet(data);
+    worksheet['!cols'] = wscols;
     const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const fileName = 'myData.xlsx';
+    const fileName = `${element.parameter[0].name}.xlsx`;
     const file = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   
     saveAs(file, fileName);
   };
 
   const handleDelete = async () => {
+    const chart = chartReference.current;
     const widget = {
       _id: assetId,
       id_widget: element.id_widget
     }
-    await axios.post("http://localhost:4000/user/deleteWidget", widget)
-    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget})) 
+    // await axios.post("http://localhost:4000/user/deleteWidget", widget)
+    dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}));
+    chart.destroy();
   }
 
   const getData = async () => {
@@ -165,6 +170,7 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
     <>
     <img className='print-button' 
       src={PrintIcon} 
+      style={disable?null:{display: 'none'}}
       draggable="false"
       onClick={exportToExcel}
       ></img>
@@ -203,6 +209,7 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
             legend: {
               display: false,
               align: 'center',
+              position: 'bottom',
             },
             title: {
               align: 'center',
@@ -214,10 +221,10 @@ function Diagram({element, disable, size, Resize, setresizing, dashboard, assetI
               display: true,
               padding: 5,
               font: {
-                size: 8,
+                size: 10,
                 weight: 50,
               },
-              text: `${(new Date(dashboard.startDate)).toLocaleString()} - now, period: ${element.periodNum,element.periodUnit}`
+              text: `${(new Date(dashboard.startDate)).toLocaleString()} - now, period: ${element.periodNum} ${element.periodUnit}, path: ${element.parameter[0].path}`
             }
           },
           scales: {

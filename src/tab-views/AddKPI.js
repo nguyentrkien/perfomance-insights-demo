@@ -131,7 +131,7 @@ function AddKPI () {
           date: new Date(Date.now()).toLocaleString()
         }]
     }
-    await axios.post("http://localhost:4000/user/addKPI", newKPI)
+    // await axios.post("http://localhost:4000/user/addKPI", newKPI)
     dispatch(addKpi(newKPI.kpi[0]));
     history.push('/admin/kpis/list'); 
     }

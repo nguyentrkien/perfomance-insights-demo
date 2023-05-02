@@ -30,7 +30,44 @@ const initialState = {
     getInitData: false,
     auth: {
         login: {
-            currentUser: {},
+            currentUser: {
+                    id: "6446820d293e88c724cc6976",
+                    name: "Admin",
+                    email: "proytb.123@gmail.com",
+                    dashboards: [
+                        {
+                            "name": "overview",
+                            "type": "overview",
+                            "asset": "edge",
+                            "id": "overview",
+                            "_id": "6446820d293e88c724cc6977"
+                        },
+                        {
+                            "name": "add",
+                            "type": "add",
+                            "asset": "edge",
+                            "id": "add",
+                            "_id": "6446820d293e88c724cc6978"
+                        },
+                        {
+                            "name": "overview",
+                            "type": "overview",
+                            "asset": "Test1",
+                            "id": "overview",
+                            "_id": "644682008qwe88c724ccx977"
+                        },
+                        {
+                            "name": "add",
+                            "type": "add",
+                            "asset": "Test1",
+                            "id": "add",
+                            "_id": "6446820d293e88cqe2zcc6978"
+                        },
+                    ],
+                    widgets: [],
+                    kpis: [],
+                    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjY0NDY4MjBkMjkzZTg4YzcyNGNjNjk3NiIsIm5hbWUiOiJ0YWluIiwiZW1haWwiOiJ0ZXN0a3BpQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiJDJiJDEwJE5TbUxkazQ1ZnFCL1FGRm90eDNPeHVIV1VhZzFSTjZveW94Tmp2Z3Y4QmNXQy9ySE1YakxPIiwiZGFzaGJvYXJkcyI6W3sibmFtZSI6Im92ZXJ2aWV3IiwidHlwZSI6Im92ZXJ2aWV3IiwiYXNzZXQiOiJlZGdlIiwiaWQiOiJvdmVydmlldyIsIl9pZCI6IjY0NDY4MjBkMjkzZTg4YzcyNGNjNjk3NyJ9LHsibmFtZSI6ImFkZCIsInR5cGUiOiJhZGQiLCJhc3NldCI6ImVkZ2UiLCJpZCI6ImFkZCIsIl9pZCI6IjY0NDY4MjBkMjkzZTg4YzcyNGNjNjk3OCJ9LHsibmFtZSI6InRlc3QiLCJ0eXBlIjoiZGFzaGJvYXJkIiwiYXNzZXQiOiJlZGdlIiwiaWQiOiI4OGNjMmMxOCIsIm5vdyI6dHJ1ZSwic3RhcnREYXRlIjoiMjAyMy0wNC0yNFQxNzowMDowMC4wMDBaIiwidG9EYXRlIjoiMjAyMy0wNC0yNVQwNjoxODoxNy4xNDVaIiwidGltZXJhbmdlIjoiZGF5IiwiX2lkIjoiNjQ0NzcwYTkzMDY1YjUxNWRhNjM3N2UzIn1dLCJ3aWRnZXRzIjpbXSwia3BpcyI6W3siaWQiOiIyMzRlM2RiMiIsIm5hbWUiOiJ2YWx1ZSIsImZvcm11bGEiOlt7ImlkIjoiYzZlIiwidHlwZSI6IlBhcmFtIiwidGV4dCI6ImEiLCJsYWJlbCI6IlZhcl90ZXN0IiwidmFySWQiOiIwMGRhNWQ3Y2Y0MTc0OTY2OGFmNTliMjU3YWRkMDI1MiJ9LHsiaWQiOiI5NjgiLCJ0eXBlIjoib3BlcmF0b3IiLCJvcGVyYXRvciI6IisifSx7ImlkIjoiZmNjIiwidHlwZSI6IlBhcmFtIiwidGV4dCI6ImIiLCJsYWJlbCI6Im5ldyIsInZhcklkIjoiMGIzMmRiZGQyYWQyNGY0MmJlYjI3YzQxMmQ1ZDFhMzUifV0sImRhdGUiOiI0LzI1LzIwMjMsIDE6MDM6MjkgUE0iLCJfaWQiOiI2NDQ3NmQzMTMwNjViNTE1ZGE2Mzc3ZTEifSx7ImlkIjoiNGMxMjUzNmQiLCJuYW1lIjoibmV3IGtwaSIsImZvcm11bGEiOlt7ImlkIjoiYWJhIiwidHlwZSI6IlBhcmFtIiwidGV4dCI6ImEiLCJsYWJlbCI6IlZhcl90ZXN0IiwidmFySWQiOiIwMGRhNWQ3Y2Y0MTc0OTY2OGFmNTliMjU3YWRkMDI1MiJ9LHsiaWQiOiI3ZWUiLCJ0eXBlIjoib3BlcmF0b3IiLCJvcGVyYXRvciI6IisifSx7ImlkIjoiMjQ2IiwidHlwZSI6IlBhcmFtIiwidGV4dCI6ImIiLCJsYWJlbCI6Im5ldyIsInZhcklkIjoiMGIzMmRiZGQyYWQyNGY0MmJlYjI3YzQxMmQ1ZDFhMzUifSx7ImlkIjoiOWJhIiwidHlwZSI6Im9wZXJhdG9yIiwib3BlcmF0b3IiOiItIn0seyJpZCI6IjQxZCIsInR5cGUiOiJQYXJhbSIsInRleHQiOiJjIiwibGFiZWwiOiJWYXJfdGVzdDIiLCJ2YXJJZCI6IjhjZDkzMDVlMmUxZjQ0NDVhYWFkN2MwNDAyN2Q3MzEwIn1dLCJkYXRlIjoiNC8yNS8yMDIzLCAyOjQyOjQxIFBNIiwiX2lkIjoiNjQ0Nzg0NzEzMDY1YjUxNWRhNjM3N2ZjIn1dLCJfX3YiOjB9LCJpYXQiOjE2ODI2NTA4MDQsImV4cCI6MTcxNDE4NjgwNH0.xIfWEZZaVIt8DJ3n2PCykIJg79AswMqCfSRrWLOpNbQ"
+            }
         }
     },
     historyAlert: [],
@@ -134,8 +171,8 @@ const StateSlice = createSlice({
             state.auth.login.currentUser.dashboards = updateStateDashboards;
             state.auth.login.currentUser.widgets = updateStateWidgets;
         },
-        loginSuccess: (state, action) => {state.auth.login.currentUser = action.payload; return state},
-        logoutSuccess: (state, action) => {state.auth.login.currentUser = null; return state},
+        // loginSuccess: (state, action) => {state.auth.login.currentUser = action.payload; return state},
+        // logoutSuccess: (state, action) => {state.auth.login.currentUser = null; return state},
         addHistoryAlert: (state, action) => {state.historyAlert.push(action.payload); return state},
         removeHistoryAlert: (state, action) => {
             const updateState = current(state.historyAlert).filter((element) => ((element.id != action.payload.id))); 
@@ -189,9 +226,7 @@ export const {
         addWidget, 
         addKpi, 
         updateWidget, 
-        deleteWidget, 
-        loginSuccess, 
-        logoutSuccess, 
+        deleteWidget,  
         addHistoryAlert, 
         removeHistoryAlert,
         removeKpi

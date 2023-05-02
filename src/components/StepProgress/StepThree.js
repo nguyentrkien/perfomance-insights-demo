@@ -2,14 +2,23 @@ import React from 'react'
 import { FormGroup, Input, Dropdown, DropdownMenu, DropdownItem, DropdownToggle } from 'reactstrap'
 import { useSelector } from 'react-redux';
 import Select, {components} from "react-select";
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function StepThree(props) {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [parameter, setParameter] = React.useState(props.form.parameter[0]);
-  const [selectedOption, setSelectedOption] = React.useState(props.form.multiSelect)
+  const [selectedOption, setSelectedOption] = React.useState(props.form.multiSelect);
+  const assets = useSelector(state => state.getAssets);
+  const location = useLocation();
+  const asset = assets.filter(e => {
+    if (e.name == location.pathname.slice(location.pathname.lastIndexOf('device/')+7, location.pathname.lastIndexOf('/dashboard')))
+      return e
+  })
   const varList = useSelector((state)=>state.getVariables);
   const varOptions = varList.map((element, i)=>{
-      return <DropdownItem key={i} onClick = {() => {handleSetParameter(element, 'VAR')}}>{element.variableName}</DropdownItem>
+      if(element.assetId == asset[0].assetId)
+        return <DropdownItem key={i} onClick = {() => {handleSetParameter(element, 'VAR')}}>{element.variableName}</DropdownItem>
   });
 
   const kpiList = useSelector((state)=>state.auth.login.currentUser?.kpis);
@@ -17,6 +26,29 @@ export default function StepThree(props) {
       return <DropdownItem key={i} onClick = {() => {handleSetParameter(element, 'KPI')}}>{element.name}</DropdownItem>
   });
   
+  const getPath = async (id) => {
+    let header = JSON.stringify([
+      {
+        "type": "Variable",
+        "id": id,
+        "aggregation": "None"
+      }
+    ]);
+    
+    let config = {
+      method: 'post',
+      url: 'http://localhost:4000/DataSources',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : header
+    };
+    
+    const {data} = await axios(config)
+    return data
+    
+  }
+
   const handleSetParameter = (element, type) => {
     if (type == 'VAR')
     {
@@ -24,8 +56,13 @@ export default function StepThree(props) {
         set: 'true',
         name: element.variableName,
         type: type,
+        dataType: element.dataType
       })
-      props.handleSelect(true,type,element.variableName, element.variableId)
+      getPath(element.variableId)
+      .then((data) => {
+        props.handleSelect(true,type,element.variableName, element.variableId, null,data[0].path.join('/'))
+        // console.log(data[0].path.join('/'))
+      })
     }
     else if (type == 'KPI')
     {
@@ -33,6 +70,7 @@ export default function StepThree(props) {
         set: 'true',
         name: element.name,
         type: type,
+        dataType: element.dataType
       })
       const listVar = element.formula.filter((e)=> {
         if (e.type == 'Param')
@@ -109,7 +147,12 @@ export default function StepThree(props) {
                   <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
                   <div className={parameter.type=='VAR'?'var':'kpi'}>
                     {parameter.type}</div>
-                  </div>
+                </div>
+                <div className='param-type'>
+                  <div style={{fontSize: '10px',opacity: '0.7'}}>Data Type</div>
+                  <div className={parameter.type=='VAR'?'var':'kpi'} style={{color: 'blue'}}>
+                    {parameter.dataType}</div>
+                </div>  
                 <i className='tim-icons icon-simple-remove' onClick={() => handleClearParameter()}></i>
               </div>
               : null

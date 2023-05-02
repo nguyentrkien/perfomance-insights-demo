@@ -22,10 +22,10 @@ function KPIs_list () {
     const data = useSelector(state => state.auth.login.currentUser?.kpis);
     const history = useHistory();
     const handleDelete = async (item) => {
-        await axios.post('http://localhost:4000/user/deleteKPI',{
-          _id: _id,
-          id: item.id
-        })
+        // await axios.post('http://localhost:4000/user/deleteKPI',{
+        //   _id: _id,
+        //   id: item.id
+        // })
         dispatch(removeKpi(item))
     }
     

@@ -40,7 +40,7 @@ function Admin(props) {
   const location = useLocation();
   const history = useHistory()
   const mainPanelRef = React.useRef(null);
-  const accessToken = useSelector(state => state.auth.login.currentUser?.accessToken);
+  const accessToken = useSelector(state => state.auth.login);
   const [sidebarOpened, setsidebarOpened] = React.useState(
     document.documentElement.className.indexOf("nav-open") !== -1
   );
@@ -134,11 +134,6 @@ function Admin(props) {
       return Promise.reject(error);
     }
   )
-
-  useEffect(()=> {
-    if(!accessToken)
-      history.push('/login');
-  },[])
 
   return (
     <chartContext.Provider value={{chartList,dispatch}}>

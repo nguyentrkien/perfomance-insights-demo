@@ -47,9 +47,9 @@ root.render(
         <BrowserRouter>
           <Switch>
             <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-            <Route path="/login" render={(props) => <Login {...props} />} />
-            <Route path="/register" render={(props) => <Register {...props} />} />
-            <Redirect from="/" to="/login" />
+            {/* <Route path="/login" render={(props) => <Login {...props} />} />
+            <Route path="/register" render={(props) => <Register {...props} />} /> */}
+            <Redirect from="/" to="/admin" />
           </Switch>
         </BrowserRouter>
       </BackgroundColorWrapper>

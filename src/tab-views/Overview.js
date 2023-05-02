@@ -15,10 +15,11 @@ import './Dashboard.scss'
 export default function Overview({asset}) {
     const history = useHistory();
     const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
+    const dashboardfilter = dashboards.filter(e => (e.asset == asset));
     const NavigateCreateDashboard = () => {
       history.push(`/admin/device/${asset}/dashboard/add`)
     }
-    const buttonDashboards = dashboards.map((element,index)=> {
+    const buttonDashboards = dashboardfilter.map((element,index)=> {
       return (
       <>
         {element.type == 'dashboard'
@@ -91,7 +92,11 @@ export default function Overview({asset}) {
                 </div>
         </Row>
     </div>
-    <OverviewPanel NavigateCreateDashboard={NavigateCreateDashboard}></OverviewPanel>
+    {
+      dashboardfilter.length > 2
+      ? history.push(`/admin/device/${asset}/dashboard/${dashboardfilter[2].id}`)
+      :<OverviewPanel NavigateCreateDashboard={NavigateCreateDashboard}></OverviewPanel>
+    }
     </>
   )
 }

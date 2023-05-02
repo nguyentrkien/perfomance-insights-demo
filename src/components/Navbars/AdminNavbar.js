@@ -93,7 +93,12 @@ function AdminNavbar(props) {
             <div>
               Hi, {name}
             </div>
-            <button onClick={(e)=> logoutUser(history, dispatch)}> Logout </button>
+            <button onClick={
+              (e)=>{ 
+                // logoutUser(history, dispatch);
+                alert('Feature\'s updating')
+              }}
+            > Logout </button>
               
           </div>
         </Container>

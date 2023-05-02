@@ -8,7 +8,7 @@ import { Form, Button } from 'reactstrap';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { addWidget } from 'store';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import './CreateWidget.scss'
 
@@ -16,12 +16,13 @@ import './CreateWidget.scss'
 export default function CreateWidget({asset, id, assetId}) {
     const history = useHistory();
     const dispatch = useDispatch();
+    const email = useSelector(state => state.auth.login.currentUser?.email)
     const [page, setPage] = React.useState("pageone");
     const [form, setForm] = React.useState({
         widgetType: '',
         widgetName: '',
         periodNum: 1,
-        periodUnit: 'Hour(s)',
+        periodUnit: 'Hour',
         parameter: [{
             set: false,
             name: '',
@@ -33,6 +34,8 @@ export default function CreateWidget({asset, id, assetId}) {
         multiSelect: [],
         alternativeLabel: '',
         decimalNumber: 2,
+        email: email,
+        warning: false,
         color: '#03a9f4',
         lowlimitalert: '',
         lowlimitwarning: '',
@@ -100,13 +103,14 @@ export default function CreateWidget({asset, id, assetId}) {
         }))
     }
 
-    const handleSelectParam = (set, type, name, varId, formula) => {
+    const handleSelectParam = (set, type, name, varId, formula, path) => {
         if (type == 'VAR'){
             let updateValue = {parameter: [{
                 set: set,
                 name: name,
                 varId: varId,
-                type: type
+                type: type,
+                path: path,
             }]}
             setForm(form => ({
                 ...form,
@@ -162,6 +166,8 @@ export default function CreateWidget({asset, id, assetId}) {
                 id_widget: id_widget,
                 widgetType: form.widgetType,
                 widgetName: form.widgetName,
+                email: form.email,
+                warning: form.lowlimitalert==''?false:true,
                 periodNum: form.periodNum,
                 periodUnit: form.periodUnit,
                 parameter: form.parameter,
@@ -169,31 +175,31 @@ export default function CreateWidget({asset, id, assetId}) {
                 alternativeLabel: form.alternativeLabel,
                 decimalNumber: form.decimalNumber,
                 color: form.color,
-                lowlimitalert: form.lowlimitalert,
-                lowlimitwarning: form.lowlimitwarning,
-                highlimitwarning: form.highlimitwarning,
-                highlimitalert: form.highlimitalert,
+                lowlimitalert: `${(form.lowlimitalert == '')?'0':form.lowlimitalert}`,
+                lowlimitwarning: `${(form.lowlimitwarning == '')?'0':form.lowlimitwarning}`,
+                highlimitwarning: `${(form.highlimitwarning == '')?'100':form.highlimitwarning}`,
+                highlimitalert: `${(form.highlimitalert == '')?'100':form.highlimitalert}`,
                 yAxisLabel: form.yAxisLabel,
                 width: `${{
                         "Diagram":'400',
                         "Pie": '245',
-                        "Gauge": '295',
+                        "Gauge": '333',
 
                     }[form.widgetType]}`, 
                 height: `${{
                     "Diagram":'200',
                     "Pie": '245',
-                    "Gauge": '210',
+                    "Gauge": '235',
                     }[form.widgetType]}`,
                 lastX: '0',
                 lastY: '0',
                 ratio: 2,
                 UnitGauge: form.UnitGauge,
                 minRange: `${(form.minRange == '')?'0':form.minRange}`,
-                maxRange: form.maxRange,
+                maxRange: `${(form.maxRange == '')?'100':form.maxRange}`,
             }]
         }
-        await axios.post("http://localhost:4000/user/addWidget", newWidget)
+        // await axios.post("http://localhost:4000/user/addWidget", newWidget)
         dispatch(addWidget(newWidget.widgets[0]))
         history.push(`/admin/device/${asset}/dashboard/${id}`);
     }

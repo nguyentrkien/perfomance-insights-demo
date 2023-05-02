@@ -18,9 +18,9 @@ export default function StepTwo(props) {
               <div className='period'>
                 <Input type='number'name='periodNum' value={props.form.periodNum} onChange={props.handleChange} required></Input>
                 <select type='text' name='periodUnit' value={props.form.periodUnit} onChange={props.handleChange} required>
-                  <option value='Hour(s)'>Hour(s)</option>
-                  <option value='Second(s)'>Second(s)</option>
-                  <option value='Minute(s)'>Minute(s)</option>
+                  <option value='Hour'>Hour</option>
+                  <option value='Second'>Second</option>
+                  <option value='Minute'>Minute</option>
                 </select>
               </div>
             </div>

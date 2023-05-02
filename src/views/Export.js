@@ -237,7 +237,7 @@ function Export () {
                   </div>
                   <div className='dashboard-setting'>
                     <h4>Date settings</h4>
-                    <div> Select variables or KPIs </div>
+                    <div> Select variables </div>
                     <Select
                     options={groupedOptions}
                     value={selectedOption}

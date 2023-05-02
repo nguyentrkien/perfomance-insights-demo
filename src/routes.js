@@ -15,12 +15,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "views/Dashboard.js";
 import Device from "views/Device.js";
-import Icons from "views/Icons.js";
 import Export from "views/Export.js"
 import Notifications from "views/Notifications.js";
-import UserProfile from "views/UserProfile.js";
+import DataStorage from "views/DataStorage.js";
 import KPIs from "views/KPIs";
 
 var routes = [
@@ -29,13 +27,6 @@ var routes = [
     name: "Device",   
     icon: "tim-icons icon-chart-pie-36",
     component: Device,
-    layout: "/admin"
-  },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: "tim-icons icon-atom",
-    component: Icons,
     layout: "/admin"
   },
   {
@@ -60,10 +51,10 @@ var routes = [
     layout: "/admin"
   },
   {
-    path: "/user-profile",
-    name: "User Profile",
-    icon: "tim-icons icon-single-02",
-    component: UserProfile,
+    path: "/dataService",
+    name: "Data Storage",
+    icon: "tim-icons icon-app",
+    component: DataStorage,
     layout: "/admin"
   },
   

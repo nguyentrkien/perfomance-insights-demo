@@ -32,10 +32,10 @@ function PieChart({element, disable, size, Resize, setresizing, dashboard, asset
   const getPeriod = (num, unit) => {
     let timeUnit
     switch (unit){
-      case "Hour(s)":
+      case "Hour":
         timeUnit = 3600;
         break
-      case "Minute(s)":
+      case "Minute":
         timeUnit = 60;
         break
       default:
@@ -111,7 +111,7 @@ function PieChart({element, disable, size, Resize, setresizing, dashboard, asset
       id_widget: element.id_widget
     }
     console.log(assetId,element.id_widget)
-    await axios.post("http://localhost:4000/user/deleteWidget", widget)
+    // await axios.post("http://localhost:4000/user/deleteWidget", widget)
     dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}))
     
   }

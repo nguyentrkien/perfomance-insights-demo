@@ -13,7 +13,6 @@ export default function StepFour(props) {
 
   const handleChange = (event) => {
     setIsChecked(event.target.checked);
-    console.log(isChecked);
   };
   const [color, setColor] = React.useState(props.form.color)
   const toggle = () => setDropdownOpen((prevState) => !prevState);
@@ -23,19 +22,28 @@ export default function StepFour(props) {
     toggle();
   };
 
-  const list = props.form.multiSelect.map((element, index) => {
-    return (
-      <div className='step-content'>
-          <div className='card-param' key={index}>
-              <div className='param-name'>{element.value}</div>
-              <div className='param-type'>
-                <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
-                <div className={element.type=='VAR'?'var':'kpi'}>
-                  {element.type}</div>
-                </div>
-              <i className='tim-icons icon-settings-gear-63'></i>
-          </div>
-          <div className='pattern'>
+  const list = () => {
+    if(props.form.multiSelect.length < 2)
+    {
+      return (
+        <div className='step-content'>
+          <div style={{color: 'red'}}>Back to Step 3 and select more variables</div>
+        </div>
+      )
+    }
+    else {
+      return props.form.multiSelect.map((element, index) => (
+          <div className='step-content'>
+            <div className='card-param' key={index}>
+                <div className='param-name'>{element.value}</div>
+                <div className='param-type'>
+                  <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
+                  <div className={element.type=='VAR'?'var':'kpi'}>
+                    {element.type}</div>
+                  </div>
+                <i className='tim-icons icon-settings-gear-63'></i>
+            </div>
+            <div className='pattern'>
             <div className='flex-3'>
               <div className='item'>
                 <div className='bold'> Alternative label </div>
@@ -58,202 +66,178 @@ export default function StepFour(props) {
                 </Dropdown>
               </div>
             </div>
-
+            </div>
           </div>
-        </div>
-    )
-  })
+    ))}
+  }
 
   return (
     <>
     {
       {
         "Diagram":
-        <FormGroup>
-        <h3 className='step-header'> 4. Display Option: </h3>
-        <div>Define the general display options for the selected parameter</div>
-        <div className='step-content'>
-          {parameter.set
-              ? 
-              <div className='card-param'>
-                <div className='param-name'>{parameter.name}</div>
-                <div className='param-type'>
-                  <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
-                  <div className={parameter.type=='VAR'?'var':'kpi'}>
-                    {parameter.type}</div>
+          <FormGroup>
+          <h3 className='step-header'> 4. Display Option: </h3>
+          <div>Define the general display options for the selected parameter</div>
+          <div className='step-content'>
+            {parameter.set
+                ? 
+                <>
+                  <div className='card-param'>
+                    <div className='param-name'>{parameter.name}</div>
+                    <div className='param-type'>
+                      <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
+                      <div className={parameter.type=='VAR'?'var':'kpi'}>
+                        {parameter.type}</div>
+                      </div>
+                    <i className='tim-icons icon-settings-gear-63'></i>
                   </div>
-                <i className='tim-icons icon-settings-gear-63'></i>
-              </div>
-              : null
-          }
-          <div className='pattern'>
-            <div className='flex-3'>
-              <div className='item'>
-                <div className='bold'> Alternative label </div>
-                <Input type='text' name='alternativeLabel' value={props.form.alternativeLabel} onChange={props.handleChange} required></Input>
-              </div>
+                  <div className='pattern'>
+                    <div className='flex-3'>
+                      <div className='item'>
+                        <div className='bold'> Alternative label </div>
+                        <Input type='text' name='alternativeLabel' value={props.form.alternativeLabel} onChange={props.handleChange} required></Input>
+                      </div>
 
-              <div className='item'>
-                <div className='bold'>Decimal places</div>
-                <Input min='0' type='number' name='decimalNumber' value={props.form.decimalNumber} onChange={props.handleChange} required></Input>
-              </div>
+                      <div className='item'>
+                        <div className='bold'>Decimal places</div>
+                        <Input min='0' type='number' name='decimalNumber' value={props.form.decimalNumber} onChange={props.handleChange} required></Input>
+                      </div>
 
-              <div className='item'>
-                <div className='bold'>Color </div>
-                <Dropdown isOpen={dropdownOpen} toggle={toggle}>
-                  <DropdownToggle className='pick-color' caret><div className='circle-color' style={{background: `${color}`}}></div></DropdownToggle>
-                  <DropdownMenu>
-                    <CirclePicker name='color' onChangeComplete={handleChangeComplete} >
-                    </CirclePicker>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
-            </div>
-
-            <div className='warning-setting'>
-              <div className='bold' style={{margin: '0 20px'}}>Warning
-                <Switch
-                  checked={isChecked}
-                  onChange={handleChange}
-                />
-              </div>
-              {isChecked
-              ?<div>
-                <Row>
-                    <div className="limit_values">
-                      <div className="input_limit_value">
-                        <div>Low limit alert:</div>
-                        <Input type="number" step="0.01" name='lowlimitalert' value={props.form.lowlimitalert} onChange={props.handleChange} required ></Input>
-                      </div> 
-                      <div className="input_limit_value">
-                        <div>Low limit warning:</div>
-                        <Input type="number" step="0.01" name='lowlimitwarning' value={props.form.lowlimitwarning} onChange={props.handleChange} required></Input>
-                      </div> 
-                      <div className="input_limit_value">
-                        <div>High limit warning:</div>
-                        <Input type="number" step="0.01" name='highlimitwarning' value={props.form.highlimitwarning} onChange={props.handleChange} required></Input>
-                      </div> 
-                      <div className="input_limit_value">
-                        <div>High limit alert:</div>
-                        <Input type="number" step="0.01" name='highlimitalert' value={props.form.highlimitalert} onChange={props.handleChange} required></Input>
-                      </div> 
+                      <div className='item'>
+                        <div className='bold'>Color </div>
+                        <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+                          <DropdownToggle className='pick-color' caret><div className='circle-color' style={{background: `${color}`}}></div></DropdownToggle>
+                          <DropdownMenu>
+                            <CirclePicker name='color' onChangeComplete={handleChangeComplete} >
+                            </CirclePicker>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
                     </div>
-                </Row>
-                <Row>
-                  <Progress multi>
-                          <Progress bar color="danger" value="20">Alert</Progress>
-                          <Progress bar color="warning" value="20">Warning</Progress>
-                          <Progress bar color="white" value="20" style={{color: "black"}}>OK</Progress>
-                          <Progress bar color="warning" value="20">Warning</Progress>
-                          <Progress bar color="danger" value="20">Alert</Progress>
-                  </Progress>
-                </Row>
-              </div>
-              :<></>}
-            </div>
+                  </div>
+                  <div className='card-param'>
+                    <div className='param-name'>Y-axis</div>
+                  </div>
+                  <div className='pattern'>
+                    <div className='yLabel'>
+                      <div className='bold'>Label</div>
+                      <Input type='text' name='yAxisLabel' placeholder="default" value={props.form.yAxisLabel} onChange={props.handleChange} required></Input>
+                    </div>
+                  </div>
+                </>
+                : <div style={{color: 'red'}}>Back to Step 3 and select a variable</div>
+            }
           </div>
-          <div className='card-param'>
-            <div className='param-name'>Y-axis</div>
-          </div>
-          <div className='pattern'>
-            <div className='yLabel'>
-              <div className='bold'>Label</div>
-              <Input type='text' name='yAxisLabel' placeholder="default" value={props.form.yAxisLabel} onChange={props.handleChange} required></Input>
-            </div>
-          </div>
-        </div>
-        </FormGroup>,
+          </FormGroup>,
         "Pie": 
         <FormGroup>
         <h3 className='step-header'> 4. Display Option: </h3>
         <div>Define the general display options for the selected parameter</div>
-        {list}
+          {list()}
         </FormGroup>,
         "Gauge":
-        <FormGroup>
-        <h3 className='step-header'> 4. Display Option: </h3>
-        <div>Define the general display options for the selected parameter</div>
-        <div className='step-content'>
-          {parameter.set
-              ? 
-              <div className='card-param'>
-                <div className='param-name'>{parameter.name}</div>
-                <div className='param-type'>
-                  <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
-                  <div className={parameter.type=='VAR'?'var':'kpi'}>
-                    {parameter.type}</div>
+          <FormGroup>
+          <h3 className='step-header'> 4. Display Option: </h3>
+          <div>Define the general display options for the selected parameter</div>
+          <div className='step-content'>
+            {parameter.set
+                ? 
+                <>
+                  <div className='card-param'>
+                    <div className='param-name'>{parameter.name}</div>
+                    <div className='param-type'>
+                      <div style={{fontSize: '10px',opacity: '0.7'}}>Type</div>
+                      <div className={parameter.type=='VAR'?'var':'kpi'}>
+                        {parameter.type}</div>
+                      </div>
+                    <i className='tim-icons icon-settings-gear-63'></i>
                   </div>
-                <i className='tim-icons icon-settings-gear-63'></i>
-              </div>
-              : null
+                  <div className='pattern'>
+                    <div className='flex-3'>
+                      <div className='item'>
+                        <div className='bold'> Unit </div>
+                        <Input type='text' name='UnitGauge' value={props.form.UnitGauge} onChange={props.handleChange} required></Input>
+                      </div>
+
+                      <div className='item'>
+                        <div className='bold'>Decimal places</div>
+                        <Input min='0' type='number' name='decimalNumber' value={props.form.decimalNumber} onChange={props.handleChange} required></Input>
+                      </div>
+
+                      <div className='item'>
+                        <div className='bold'>Color </div>
+                        <Dropdown isOpen={dropdownOpen} toggle={toggle}>
+                          <DropdownToggle className='pick-color' caret><div className='circle-color' style={{background: `${color}`}}></div></DropdownToggle>
+                          <DropdownMenu>
+                            <CirclePicker name='color' onChangeComplete={handleChangeComplete} >
+                            </CirclePicker>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
+                    </div>
+
+                    <div className='warning-setting'>
+                      <div className='bold' style={{margin: '0 20px'}}>Warning
+                        <Switch
+                          checked={isChecked}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    {isChecked
+                    ?
+                    <>
+                      <Row>
+                          <div className="limit_values" style={{margin: '0px'}}>
+                          <div className="input_limit_value">
+                              <div>Min Range:</div>
+                              <Input type="number" step="0.01" name='minRange' value={props.form.minRange} onChange={props.handleChange} required></Input>
+                            </div> 
+                            <div className="input_limit_value">
+                              <div>Low limit alert:</div>
+                              <Input type="number" step="0.01" name='lowlimitalert' value={props.form.lowlimitalert} onChange={props.handleChange} required ></Input>
+                            </div> 
+                            <div className="input_limit_value">
+                              <div>Low limit warning:</div>
+                              <Input type="number" step="0.01" name='lowlimitwarning' value={props.form.lowlimitwarning} onChange={props.handleChange} required></Input>
+                            </div> 
+                            <div className="input_limit_value">
+                              <div>High limit warning:</div>
+                              <Input type="number" step="0.01" name='highlimitwarning' value={props.form.highlimitwarning} onChange={props.handleChange} required></Input>
+                            </div> 
+                            <div className="input_limit_value">
+                              <div>High limit alert:</div>
+                              <Input type="number" step="0.01" name='highlimitalert' value={props.form.highlimitalert} onChange={props.handleChange} required></Input>
+                            </div> 
+                            <div className="input_limit_value">
+                              <div>Max Range:</div>
+                              <Input type="number" step="0.01" name='maxRange' value={props.form.maxRange} onChange={props.handleChange} required></Input>
+                            </div> 
+                          </div>
+                      </Row>
+                      <Row>
+                        <Progress multi style={{margin: '2px 90px 20px 90px'}}>
+                                <Progress bar color="danger" value="20">Alert</Progress>
+                                <Progress bar color="warning" value="20">Warning</Progress>
+                                <Progress bar color="white" value="20" style={{color: "black"}}>OK</Progress>
+                                <Progress bar color="warning" value="20">Warning</Progress>
+                                <Progress bar color="danger" value="20">Alert</Progress>
+                        </Progress>
+                      </Row>
+                      <Row style={{display: 'flex', alignItems: 'center'}}>
+                        <div style={{margin: '0 20px',fontWeight: '600'}}>Receiver Email:</div>
+                        <input type="email" name='email' value={props.form.email} onChange={props.handleChange} style={{minWidth: '200px', textAlign: 'center'}} required></input>
+                      </Row>
+                      </>
+                    :<></>  
+                    }
+                    </div>
+                  </div>
+                </>
+            : <div style={{color: 'red'}}>Back to Step 3 and select a variable</div>
           }
-          <div className='pattern'>
-            <div className='flex-3'>
-              <div className='item'>
-                <div className='bold'> Unit </div>
-                <Input type='text' name='UnitGauge' value={props.form.UnitGauge} onChange={props.handleChange} required></Input>
-              </div>
-
-              <div className='item'>
-                <div className='bold'>Decimal places</div>
-                <Input min='0' type='number' name='decimalNumber' value={props.form.decimalNumber} onChange={props.handleChange} required></Input>
-              </div>
-
-              <div className='item'>
-                <div className='bold'>Color </div>
-                <Dropdown isOpen={dropdownOpen} toggle={toggle}>
-                  <DropdownToggle className='pick-color' caret><div className='circle-color' style={{background: `${color}`}}></div></DropdownToggle>
-                  <DropdownMenu>
-                    <CirclePicker name='color' onChangeComplete={handleChangeComplete} >
-                    </CirclePicker>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
-            </div>
-
-            <div className='warning-setting'>
-              <div className='bold'>Warning: </div>
-              <Row>
-                  <div className="limit_values" style={{margin: '0px'}}>
-                  <div className="input_limit_value">
-                      <div>Min Range:</div>
-                      <Input type="number" step="0.01" name='minRange' value={props.form.minRange} onChange={props.handleChange} required></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>Low limit alert:</div>
-                      <Input type="number" step="0.01" name='lowlimitalert' value={props.form.lowlimitalert} onChange={props.handleChange} required ></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>Low limit warning:</div>
-                      <Input type="number" step="0.01" name='lowlimitwarning' value={props.form.lowlimitwarning} onChange={props.handleChange} required></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>High limit warning:</div>
-                      <Input type="number" step="0.01" name='highlimitwarning' value={props.form.highlimitwarning} onChange={props.handleChange} required></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>High limit alert:</div>
-                      <Input type="number" step="0.01" name='highlimitalert' value={props.form.highlimitalert} onChange={props.handleChange} required></Input>
-                    </div> 
-                    <div className="input_limit_value">
-                      <div>Max Range:</div>
-                      <Input type="number" step="0.01" name='maxRange' value={props.form.maxRange} onChange={props.handleChange} required></Input>
-                    </div> 
-                  </div>
-              </Row>
-              <Row>
-                <Progress multi style={{margin: '2px 90px 20px 90px'}}>
-                        <Progress bar color="danger" value="20">Alert</Progress>
-                        <Progress bar color="warning" value="20">Warning</Progress>
-                        <Progress bar color="white" value="20" style={{color: "black"}}>OK</Progress>
-                        <Progress bar color="warning" value="20">Warning</Progress>
-                        <Progress bar color="danger" value="20">Alert</Progress>
-                </Progress>
-              </Row>
-            </div>
           </div>
-        </div>
-        </FormGroup>
+          </FormGroup>
 
       }[props.form.widgetType]
     }

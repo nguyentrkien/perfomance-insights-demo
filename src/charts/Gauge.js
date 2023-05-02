@@ -22,15 +22,15 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
   const [initData,setInitData] = React.useState([]);
   const [initNeedle,setInitNeedle] = React.useState();
   const [data, setData] = React.useState();
-   
+
   //calculate period
   const getPeriod = (num, unit) => {
     let timeUnit
     switch (unit){
-      case "Hour(s)":
+      case "Hour":
         timeUnit = 3600;
         break
-      case "Minute(s)":
+      case "Minute":
         timeUnit = 60;
         break
       default:
@@ -139,74 +139,102 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
       }))
       const calculateKPI = new Function(...element.parameter[0].listVar.map((item) => item.text), `return ${element.parameter[0].formula}`)
       return calculateKPI(...listData)
-
+      
     }
   }
+
+  const sendEmail = async (email, subject, message) => {
+    var data = JSON.stringify({
+      "email": email,
+      "subject": subject,
+      "content": message
+    });
     
+    var config = {
+      method: 'post',
+      url: 'http://localhost:4000/email/send',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : data
+    };
+    
+    await axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
   //setInterval
   useEffect(()=>{
     const interval = setInterval(() => {
       const chart = chartReference.current;
       getData()
-        .then((data) =>{
-          if (data <= element.lowlimitalert)
+      .then((data) =>{
+        chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
+        chart.update();
+        if(element.warning)
           {
-            console.log('alert')
-            notify("alert","Threshold Crossing Alert")
-            let id = uuid().slice(0,8);
-            dispatch(addHistoryAlert({
-              id: id,
-              parameter: element.parameter[0].name,
-              type: element.parameter[0].type,
-              alertType: 'Alert',
-              value: data.toFixed(element.decimalNumber),
-              date: (new Date(Date.now())).toLocaleString()
-            }))
+            if (data <= element.lowlimitalert)
+            {
+              sendEmail(element.email, "[Alert !!!]", `Parameter ${element.parameter[0].name} has exceed the allowable threshold at ${(new Date(Date.now())).toLocaleString()} with value = ${data.toFixed(element.decimalNumber)}` );
+              notify("alert","Threshold Crossing Alert")
+              let id = uuid().slice(0,8);
+              dispatch(addHistoryAlert({
+                id: id,
+                parameter: element.parameter[0].name,
+                type: element.parameter[0].type,
+                alertType: 'Alert',
+                value: data.toFixed(element.decimalNumber),
+                date: (new Date(Date.now())).toLocaleString()
+              }))
+            }
+            else if ((data >= element.lowlimitalert) && ((data <= element.lowlimitwarning)))
+            {
+              console.log('warning')
+              let id = uuid().slice(0,8);
+              notify("warning","Threshold Crossing Warning");
+              dispatch(addHistoryAlert({
+                id: id,
+                parameter: element.parameter[0].name,
+                type: element.parameter[0].type,
+                alertType: 'Warning',
+                value: data.toFixed(element.decimalNumber),
+                date: (new Date(Date.now())).toLocaleString()
+              }))
+            }
+            else if ((data >= element.highlimitwarning) && ((data <= element.highlimitalert)))
+            {
+              console.log('warning')
+              let id = uuid().slice(0,8);
+              notify("warning","Threshold Crossing Warning")
+              dispatch(addHistoryAlert({
+                id: id,
+                parameter: element.parameter[0].name,
+                type: element.parameter[0].type,
+                alertType: 'Warning',
+                value: data.toFixed(element.decimalNumber),
+                date: (new Date(Date.now())).toLocaleString()
+              }))
+            }
+            else if (data >= element.highlimitalert)
+            {
+              sendEmail(element.email, "[Alert !!!]", `Parameter ${element.parameter[0].name} has exceed the allowable threshold at ${(new Date(Date.now())).toLocaleString()} with value = ${data.toFixed(element.decimalNumber)}` );
+              notify("danger","Threshold Crossing Alert")
+              let id = uuid().slice(0,8);
+              dispatch(addHistoryAlert({
+                id: id,
+                parameter: element.parameter[0].name,
+                type: element.parameter[0].type,
+                alertType: 'Alert',
+                value: data.toFixed(element.decimalNumber),
+                date: (new Date(Date.now())).toLocaleString()
+              }))
+            }
           }
-          else if ((data >= element.lowlimitalert) && ((data <= element.lowlimitwarning)))
-          {
-            console.log('warning')
-            let id = uuid().slice(0,8);
-            notify("warning","Threshold Crossing Warning");
-            dispatch(addHistoryAlert({
-              id: id,
-              parameter: element.parameter[0].name,
-              type: element.parameter[0].type,
-              alertType: 'Warning',
-              value: data.toFixed(element.decimalNumber),
-              date: (new Date(Date.now())).toLocaleString()
-            }))
-          }
-          else if ((data >= element.highlimitwarning) && ((data <= element.highlimitalert)))
-          {
-            console.log('warning')
-            let id = uuid().slice(0,8);
-            notify("warning","Threshold Crossing Warning")
-            dispatch(addHistoryAlert({
-              id: id,
-              parameter: element.parameter[0].name,
-              type: element.parameter[0].type,
-              alertType: 'Warning',
-              value: data.toFixed(element.decimalNumber),
-              date: (new Date(Date.now())).toLocaleString()
-            }))
-          }
-          else if (data >= element.highlimitalert)
-          {
-            console.log('alert')
-            notify("danger","Threshold Crossing Alert")
-            let id = uuid().slice(0,8);
-            dispatch(addHistoryAlert({
-              id: id,
-              parameter: element.parameter[0].name,
-              type: element.parameter[0].type,
-              alertType: 'Alert',
-              value: data.toFixed(element.decimalNumber),
-              date: (new Date(Date.now())).toLocaleString()
-            }))
-          }
-          chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
-          chart.update();
         })
       // chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
       // console.log(data)
@@ -219,7 +247,7 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
     .then((data) =>{setInitNeedle(data.toFixed(element.decimalNumber))})
       
   const options = {
-        type: 'doughnut',
+      type: 'doughnut',
       plugins: [{
         afterDraw: chart => {
           var needleValue = chart.config.data.datasets[0].needleValue;
@@ -246,7 +274,17 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
           ctx.fill();
 
           ctx.font = "16px Arial";
-          ctx.fillText(`Value: ${needleValue}`,cx-40, cy+20);
+          ctx.fillStyle = 'black';
+          ctx.fillText(`${element.minRange}`,cx/2.5, cy+15);
+          ctx.fillText(`${element.maxRange}`,cx*3/2, cy+15);
+          ctx.font = 'bold 16px Arial';
+          ctx.fillStyle = 'black';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${needleValue}`,cx, cy+20);
+          ctx.font = 'bold 12px Arial';
+          ctx.fillStyle = 'grey';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${element.UnitGauge}`,cx, cy+30);
         }
       }],
       data: {
@@ -285,10 +323,10 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
             display: true,
             padding: 5,
             font: {
-              size: 8,
+              size: 10,
               weight: 50,
             },
-            text: `${(new Date(dashboard.startDate)).toLocaleDateString()}, period: ${element.periodNum,element.periodUnit}`
+            text: `${(new Date(dashboard.startDate)).toLocaleDateString()}, period: ${element.periodNum,element.periodUnit}, path: ${element.parameter[0].path}`
           },
         },
         layout: {
@@ -311,12 +349,12 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
   };
 
   const handleDelete = async () => {
-    const widget = {
-      _id: assetId,
-      id_widget: element.id_widget
-    }
-    console.log(assetId,element.id_widget)
-    await axios.post("http://localhost:4000/user/deleteWidget", widget)
+    // const widget = {
+    //   _id: assetId,
+    //   id_widget: element.id_widget
+    // }
+    // console.log(assetId,element.id_widget)
+    // await axios.post("http://localhost:4000/user/deleteWidget", widget)
     dispatch(deleteWidget({id: dashboard.id, id_widget: element.id_widget}))
     
   }

@@ -17,16 +17,15 @@ export default function DashboardE({asset, id, assetId}) {
     const history = useHistory();
     const location = useLocation();
     const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
+    const dashboardfilter = dashboards.filter(e => (e.asset == asset));
     const dashboardSelected = location.pathname.slice(location.pathname.lastIndexOf('dashboard/')+10, location.pathname.lastIndexOf('dashboard/')+18)
     const NavigateCreateDashboard = () => {
       history.push(`/admin/device/${asset}/dashboard/add`)
     }
 
-    console.log(dashboardSelected)
-
-    const buttonDashboards = dashboards.map((element,index)=> {
+    const buttonDashboards = dashboardfilter.map((element,index)=> {
       return (
-      <>
+      <div key={index}>
         {element.type == 'dashboard'
         ?
         <>
@@ -52,7 +51,7 @@ export default function DashboardE({asset, id, assetId}) {
         </>
         : null
         }
-        </>
+        </div>
       )
     })
 
@@ -107,7 +106,7 @@ export default function DashboardE({asset, id, assetId}) {
       dashboards.map((dashboard) => {
         if (dashboard.id == dashboardSelected)
           return (
-            <Panel asset={asset} id={id} dashboard={dashboard} assetId={assetId}></Panel>
+            <Panel asset={asset} id={id} dashboard={dashboard} assetId={assetId} key={id}></Panel>
             )
       })
     }

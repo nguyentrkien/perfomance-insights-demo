@@ -40,6 +40,10 @@ function Notifications() {
   const dispatch = useDispatch();
   const data = useSelector(state => state.historyAlert);
   const handleExport = (datas) => {
+    if (datas.length == 0) {
+      alert('There are no data to export')
+      return true
+    }
     const data = datas.map(e => {return {
       Parameter: e.parameter,
       Type: e.type,

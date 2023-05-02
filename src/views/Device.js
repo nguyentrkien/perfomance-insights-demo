@@ -23,7 +23,6 @@ import { useState } from "react";
 import { NavLink, useLocation, Route, Switch} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Dashboard from "views/Dashboard.js";
-import Icons from "views/Icons.js";
 import { getAssets } from "store";
 // reactstrap components
 import {
@@ -35,7 +34,6 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 function Device(props) {
   const location = useLocation();
   const dispatch = useDispatch();
-  const history = useHistory();
   const [select, setSelect] = useState(null);
   const assets = useSelector((state)=> state.getAssets);
   const isGetAssets = useSelector((state)=> state.isGetAssets);
@@ -49,7 +47,6 @@ function Device(props) {
           <Route
             path={'/admin/device/' + prop.name + '/dashboard'}
             render={()=><Dashboard asset={prop.name}></Dashboard>}
-            // component={Dashboard}
             key={i}
             />
         );

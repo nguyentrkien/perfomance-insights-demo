@@ -25,9 +25,7 @@ export default function Panel({asset, id, dashboard, assetId}) {
     const [showConfirmation, setShowConfirmation] = useState(false);
     let widgetList = useSelector(state => state.auth.login.currentUser?.widgets);
     widgetList = widgetList.filter(element => (element.asset == asset) && (element.id == id));
-    //day of dashboard
-    // console.log(dashboard.startDate, dashboard.toDate)
-    // const toDate = new Date(new Date(dashboard.startDate).getTime() + 60 * 60 * 24 * 1000);
+
 
     const widgets = widgetList.map((element, i) => {
         return <Widget element={element} disable={disable} dashboard={dashboard} assetId={assetId} key={i}></Widget>
@@ -50,7 +48,7 @@ export default function Panel({asset, id, dashboard, assetId}) {
             "_id": assetId,
         }
         dispatch(deleteDashboard(info));
-        await axios.post('http://localhost:4000/user/deleteDashboard', info);
+        // await axios.post('http://localhost:4000/user/deleteDashboard', info);
     }
 
   return (
@@ -59,10 +57,23 @@ export default function Panel({asset, id, dashboard, assetId}) {
         ?<>
         {((widgets.length == 0))
             ?
+            <div>
+                    <Confirmation 
+                    dashboard={dashboard}
+                    showConfirmation={showConfirmation} 
+                    setShowConfirmation={setShowConfirmation} 
+                    handleConfirmDelete={handleConfirmDelete}>
+                    </Confirmation>
             <div className='dashboard-panel'>
                 <i className='tim-icons icon-puzzle-10 puzzle'></i>
                 <h4>No widget has been created yet.</h4>
                 <Button onClick={HandleCreateWidget}>Create firset widget</Button>
+                <div className='button-header-setting'> 
+                    <div className={`setting`} onClick={e => setShowConfirmation(true)} >
+                        <i className='tim-icons icon-basket-simple'></i>
+                    </div>
+                </div>
+            </div>
             </div>
             :
             <div>
@@ -111,7 +122,7 @@ function Confirmation ({dashboard, showConfirmation, setShowConfirmation, handle
         {showConfirmation && (<div className='confirm-bg' onClick={() => setShowConfirmation(false)}>
             <div className='dialog'>
                 <div>
-                <div style={{marginBottom: '5px'}}>Are you sure you want to delete <b>{dashboard.name}</b>?</div>
+                <div style={{marginBottom: '5px'}}>Are you sure you want to delete dashboard <b>{dashboard.name}</b>?</div>
                 <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
                     <button type='Yes' onClick={handleConfirmDelete}>Yes</button>
                     <button type='No' onClick={() => setShowConfirmation(false)}>No</button>
@@ -129,6 +140,7 @@ function Widget({element, disable, dashboard, assetId}) {
     const [resizing, setResizing] = React.useState(false);
     const [size, setSize] = React.useState({width: element.width, height: element.height})
     const position = {lastX: element.lastX, lastY: element.lastY}
+    console.log(element)
     const Resize = (dx,dy) => {
         setSize(prevState => {
             dispatch(updateWidget({

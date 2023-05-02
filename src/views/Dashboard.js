@@ -28,28 +28,28 @@ function Dashboard({asset}) {
   const dispatch = useDispatch();
   const history = useHistory();
   const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
+  const dashboardfilter = dashboards.filter(e => (e.asset == asset));
+  console.log(dashboardfilter);
   const _id = useSelector(state => state.auth.login.currentUser?._id);
-
-  const getRoutes = (dashboards) => {
-    return dashboards?.map((prop, i) => {
+  const getRoutes = (dashboardfilter) => {
+    return dashboardfilter?.map((prop, i) => {
         return (
           <Route
-            path={`/admin/device/${prop.asset}/dashboard/` + prop.id}
-            render = {()=> {
-              switch(prop.type){
-                case 'overview':
-                  return (<Overview asset={prop.asset}></Overview>)
-                case 'add':
-                  return (<CreateDashboard asset={prop.asset} assetId={_id}></CreateDashboard>)
-                case 'dashboard':
-                  return (<DashboardE asset={prop.asset} id={prop.id} assetId={_id}></DashboardE>)
-                    }
-                  }
-                }
-            key={i}
-                />
-        );
-    });
+          path={`/admin/device/${prop.asset}/dashboard/` + prop.id}
+          render = {()=> {
+            switch(prop.type){
+              case 'overview':
+                return (<Overview asset={prop.asset}></Overview>)
+              case 'add':
+                return (<CreateDashboard asset={prop.asset} assetId={_id}></CreateDashboard>)
+              case 'dashboard':
+                return (<DashboardE asset={prop.asset} id={prop.id} assetId={_id}></DashboardE>)
+            }
+          }}
+          key={i}
+          />);
+      }
+    );
   };
   
   React.useEffect(()=>{
@@ -60,7 +60,7 @@ function Dashboard({asset}) {
   return (
       <div className="content">
         <Switch>
-          {getRoutes(dashboards)}
+          {getRoutes(dashboardfilter)}
           <Redirect from="*" to={`/admin/device/${asset}/dashboard/overview`}></Redirect>
         </Switch>
       </div>
