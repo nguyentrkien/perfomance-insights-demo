@@ -138,9 +138,9 @@ function Widget({element, disable, dashboard, assetId}) {
     const dispatch = useDispatch();
     const history = useHistory();
     const [resizing, setResizing] = React.useState(false);
-    const [size, setSize] = React.useState({width: element.width, height: element.height})
-    const position = {lastX: element.lastX, lastY: element.lastY}
-    console.log(element)
+    const [size, setSize] = React.useState({width: element.width, height: element.height});
+    const position = {lastX: element.lastX, lastY: element.lastY};
+
     const Resize = (dx,dy) => {
         setSize(prevState => {
             dispatch(updateWidget({

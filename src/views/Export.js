@@ -55,7 +55,7 @@ function Export () {
         setSelectedOption(selectedOption);
       };
 
-    const getData = async ({variableId, startDate, toDate, aggregation, period}) => {
+    const getData = async ({variableId, startDate, toDate, aggregation, num, period}) => {
         var timeRange
         switch(period){
           case("minute"):
@@ -71,7 +71,7 @@ function Export () {
         var dataRequest = JSON.stringify({
             "from": `${startDate}`,
             "to": `${toDate}`,
-            "calculationTimeRange": timeRange,
+            "calculationTimeRange": num*timeRange,
             "dataSources": [
               {
                 "id": `${variableId}`,
@@ -94,11 +94,12 @@ function Export () {
     }
 
 
-    const exportToExcel = (name, varName, data, aggregation, period) => {
+    const exportToExcel = (name, varName, data, aggregation, num, period) => {
+        var row_character;
         const datas = data.reduce((previous, current, currentIndex) => {
           return [...previous, ...current.values.map((e,i)=> {return {Date: new Date(e.timestamp).toLocaleString(), [varName[currentIndex]]:e.value}})]
         },[])
-        
+
         const result = Object.values(datas.reduce((acc, obj) => {
           const key = obj.Date;
           if (!acc[key]) {
@@ -108,26 +109,45 @@ function Export () {
           return acc;
         }, {}));
 
+        switch (varName.length) {
+          case 1:
+            row_character = 'B';
+            break
+          case 2:
+            row_character = 'C';
+            break
+          case 3:
+            row_character = 'D';
+            break
+          case 4:
+            row_character = 'E';
+            break
+          case 5:
+            row_character = 'F';
+            break
+        }
+
         const header = [{title: 'THANH THIEN TECHNOLOGY JSC'}];
         const info = [
         {title: 'From:',date: `${result[0].Date}`},
         {title: 'To:',date: `${result[result.length-1].Date}`},
         {title: 'Aggregation:',date: `${aggregation}`},
-        {title: 'Period:',date: `${period}`}
+        {title: 'Period:',date: `${num} ${period}`}
         ]
-        const Report = [{title: "Report"}]
+        const Report = [{title: "Report"}];
         const wscols = [
           {wch:25},
-          {wch:30},
-          {wch:30},
         ];
+        for (var i = 0; i < varName.length; i ++) { 
+          wscols.push({wch:30})
+        }
         const worksheet = XLSX.utils.json_to_sheet(result, {origin: 'A8'});
         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         XLSX.utils.sheet_add_json(worksheet, header, {skipHeader: true, origin: 'A1'});
         XLSX.utils.sheet_add_json(worksheet, info, {skipHeader: true, origin: 'B3'});
         XLSX.utils.sheet_add_json(worksheet, Report, {skipHeader: true, origin: 'A3'});
         const merge = [
-          { s: { r: 0, c: 0 }, e: { r: 1, c: 2 } },{ s: {r: 2, c: 0}, e: {r:5, c:0}}
+          { s: { r: 0, c: 0 }, e: { r: 1, c: varName.length } },{s: {r: 2, c: 0}, e: {r:5, c:0}}
         ];
         var cell = worksheet['A1'];
         var style = {
@@ -164,9 +184,17 @@ function Export () {
         worksheet['B4'].s = styleInfo;
         worksheet['B5'].s = styleInfo;
         worksheet['B6'].s = styleInfo;
-        worksheet['A8'].s = styleHeader;
-        worksheet['B8'].s = styleHeader;
-        worksheet['C8'].s = styleHeader;
+
+
+
+        var range = XLSX.utils.decode_range(`A8:${row_character}8`);
+        for (var row = range.s.r; row <= range.e.r; row++) {
+          for (var col = range.s.c; col <= range.e.c; col++) {
+              var cell = XLSX.utils.encode_cell({ r: row, c: col });
+              if (worksheet[cell]) 
+                worksheet[cell].s = styleHeader;
+          }
+      }
         
         worksheet["!merges"] = merge;
         worksheet['!cols'] = wscols;
@@ -188,7 +216,7 @@ function Export () {
             }
         }
 
-        var range = XLSX.utils.decode_range(`A9:C${result.length+9}`);
+        var range = XLSX.utils.decode_range(`A9:${row_character}${result.length+9}`);
         for (var row = range.s.r; row <= range.e.r; row++) {
             for (var col = range.s.c; col <= range.e.c; col++) {
                 var cell = XLSX.utils.encode_cell({ r: row, c: col });
@@ -215,12 +243,12 @@ function Export () {
     const handleAddDashboard = (e) => {
         e.preventDefault();
         const dataPending = Promise.all(selectedOption.map((element)=>{
-            return getData({variableId: element.varId, startDate: new Date(e.target.startDate.value).toISOString(), toDate: `${checked? new Date(Date.now()).toISOString(): new Date(e.target.toDate.value).toISOString()}`, aggregation: e.target.aggregation.value, period: e.target.period.value});
+            return getData({variableId: element.varId, startDate: new Date(e.target.startDate.value).toISOString(), toDate: `${checked? new Date(Date.now()).toISOString(): new Date(e.target.toDate.value).toISOString()}`, aggregation: e.target.aggregation.value, num: e.target.num.value, period: e.target.period.value});
         }))
         const varName = selectedOption.map((element)=> element.label);
         dataPending
             .then((data) => {
-                exportToExcel(e.target.filename.value, varName, data, e.target.aggregation.value, e.target.period.value)
+                exportToExcel(e.target.filename.value, varName, data, e.target.aggregation.value, e.target.num.value, e.target.period.value)
             })
         
         
@@ -249,7 +277,8 @@ function Export () {
                         <div>
                             Period:
                         </div>
-                        <select type="period" name="period" required>
+                        <input type="number" name="num" style={{textAlign: 'right', maxWidth: '50px'}} required/>
+                        <select type="period" name="period" style={{minHeight: '26px', marginLeft: '5px'}} required>
                             {period}
                         </select>
                         </div>
@@ -258,7 +287,7 @@ function Export () {
                         <div>
                             Aggregation:
                         </div>
-                        <select type="aggregation" name="aggregation" style={{width: '150px'}} required>
+                        <select type="aggregation" name="aggregation" style={{width: '150px', minHeight: '26px'}} required>
                             {aggregation}
                         </select>
                         </div>

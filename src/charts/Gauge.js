@@ -21,7 +21,9 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
   const [isGetData, setIsGetData] = React.useState(false);
   const [initData,setInitData] = React.useState([]);
   const [initNeedle,setInitNeedle] = React.useState();
-  const [data, setData] = React.useState();
+  const [dataValue, setDataValue] = React.useState(0);
+  const [dataMax, setDataMax] = React.useState(0);
+  const [dataMin, setDataMin] = React.useState(0);
 
   //calculate period
   const getPeriod = (num, unit) => {
@@ -84,7 +86,7 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
   },[disable])
   
   //async function fetch data
-  const getData = async () => {
+  const getData = async (aggregation) => {
     if (element.parameter[0].type == 'VAR')
     {
       var dataRequest = JSON.stringify({
@@ -95,7 +97,7 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
           {
             "id": `${element.parameter[0].varId}`,
             "type": "Variable",
-            "aggregation": "Average"
+            "aggregation": aggregation
           }
         ]
       });
@@ -170,81 +172,103 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
 
   //setInterval
   useEffect(()=>{
+    getData('Average')
+    .then((data) =>{setInitNeedle(data.toFixed(element.decimalNumber)); setDataValue(data);})
+    getData('Max')
+    .then((data) => {
+      setDataMax(data);
+    })
+    getData('Min')
+    .then((data) => {
+      setDataMin(data);
+    })
     const interval = setInterval(() => {
-      const chart = chartReference.current;
-      getData()
-      .then((data) =>{
-        chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
-        chart.update();
-        if(element.warning)
-          {
-            if (data <= element.lowlimitalert)
-            {
-              sendEmail(element.email, "[Alert !!!]", `Parameter ${element.parameter[0].name} has exceed the allowable threshold at ${(new Date(Date.now())).toLocaleString()} with value = ${data.toFixed(element.decimalNumber)}` );
-              notify("alert","Threshold Crossing Alert")
-              let id = uuid().slice(0,8);
-              dispatch(addHistoryAlert({
-                id: id,
-                parameter: element.parameter[0].name,
-                type: element.parameter[0].type,
-                alertType: 'Alert',
-                value: data.toFixed(element.decimalNumber),
-                date: (new Date(Date.now())).toLocaleString()
-              }))
-            }
-            else if ((data >= element.lowlimitalert) && ((data <= element.lowlimitwarning)))
-            {
-              console.log('warning')
-              let id = uuid().slice(0,8);
-              notify("warning","Threshold Crossing Warning");
-              dispatch(addHistoryAlert({
-                id: id,
-                parameter: element.parameter[0].name,
-                type: element.parameter[0].type,
-                alertType: 'Warning',
-                value: data.toFixed(element.decimalNumber),
-                date: (new Date(Date.now())).toLocaleString()
-              }))
-            }
-            else if ((data >= element.highlimitwarning) && ((data <= element.highlimitalert)))
-            {
-              console.log('warning')
-              let id = uuid().slice(0,8);
-              notify("warning","Threshold Crossing Warning")
-              dispatch(addHistoryAlert({
-                id: id,
-                parameter: element.parameter[0].name,
-                type: element.parameter[0].type,
-                alertType: 'Warning',
-                value: data.toFixed(element.decimalNumber),
-                date: (new Date(Date.now())).toLocaleString()
-              }))
-            }
-            else if (data >= element.highlimitalert)
-            {
-              sendEmail(element.email, "[Alert !!!]", `Parameter ${element.parameter[0].name} has exceed the allowable threshold at ${(new Date(Date.now())).toLocaleString()} with value = ${data.toFixed(element.decimalNumber)}` );
-              notify("danger","Threshold Crossing Alert")
-              let id = uuid().slice(0,8);
-              dispatch(addHistoryAlert({
-                id: id,
-                parameter: element.parameter[0].name,
-                type: element.parameter[0].type,
-                alertType: 'Alert',
-                value: data.toFixed(element.decimalNumber),
-                date: (new Date(Date.now())).toLocaleString()
-              }))
-            }
+      if(element.warning){
+        const chart = chartReference.current;
+        getData('Average')
+        .then((data) => {
+          chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
+          chart.update();
+              if (data <= element.lowlimitalert)
+              {
+                sendEmail(element.email, "[Alert !!!]", `Parameter ${element.parameter[0].name} has exceed the allowable threshold at ${(new Date(Date.now())).toLocaleString()} with value = ${data.toFixed(element.decimalNumber)}` );
+                notify("alert","Threshold Crossing Alert")
+                let id = uuid().slice(0,8);
+                dispatch(addHistoryAlert({
+                  id: id,
+                  parameter: element.parameter[0].name,
+                  type: element.parameter[0].type,
+                  alertType: 'Alert',
+                  value: data.toFixed(element.decimalNumber),
+                  date: (new Date(Date.now())).toLocaleString()
+                }))
+              }
+              else if ((data >= element.lowlimitalert) && ((data <= element.lowlimitwarning)))
+              {
+                console.log('warning')
+                let id = uuid().slice(0,8);
+                notify("warning","Threshold Crossing Warning");
+                dispatch(addHistoryAlert({
+                  id: id,
+                  parameter: element.parameter[0].name,
+                  type: element.parameter[0].type,
+                  alertType: 'Warning',
+                  value: data.toFixed(element.decimalNumber),
+                  date: (new Date(Date.now())).toLocaleString()
+                }))
+              }
+              else if ((data >= element.highlimitwarning) && ((data <= element.highlimitalert)))
+              {
+                console.log('warning')
+                let id = uuid().slice(0,8);
+                notify("warning","Threshold Crossing Warning")
+                dispatch(addHistoryAlert({
+                  id: id,
+                  parameter: element.parameter[0].name,
+                  type: element.parameter[0].type,
+                  alertType: 'Warning',
+                  value: data.toFixed(element.decimalNumber),
+                  date: (new Date(Date.now())).toLocaleString()
+                }))
+              }
+              else if (data >= element.highlimitalert)
+              {
+                sendEmail(element.email, "[Alert !!!]", `Parameter ${element.parameter[0].name} has exceed the allowable threshold at ${(new Date(Date.now())).toLocaleString()} with value = ${data.toFixed(element.decimalNumber)}` );
+                notify("danger","Threshold Crossing Alert")
+                let id = uuid().slice(0,8);
+                dispatch(addHistoryAlert({
+                  id: id,
+                  parameter: element.parameter[0].name,
+                  type: element.parameter[0].type,
+                  alertType: 'Alert',
+                  value: data.toFixed(element.decimalNumber),
+                  date: (new Date(Date.now())).toLocaleString()
+                }))
+              }
           }
+        )
+      }
+      else {
+        getData('Average')
+        .then((data) => {
+          setDataValue(data);
         })
+        getData('Max')
+        .then((data) => {
+          setDataMax(data);
+        })
+        getData('Min')
+        .then((data) => {
+          setDataMin(data);
+        })
+      }
+
       // chart.data.datasets[0].needleValue = data.toFixed(element.decimalNumber);
       // console.log(data)
     }, getPeriod(element.periodNum, element.periodUnit)*1000);
     return () => clearInterval(interval);
-    },[])
+  },[])
 
-  //init-data
-  getData()
-    .then((data) =>{setInitNeedle(data.toFixed(element.decimalNumber))})
       
   const options = {
       type: 'doughnut',
@@ -326,7 +350,7 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
               size: 10,
               weight: 50,
             },
-            text: `${(new Date(dashboard.startDate)).toLocaleDateString()}, period: ${element.periodNum,element.periodUnit}, path: ${element.parameter[0].path}`
+            text: `${(new Date(dashboard.startDate)).toLocaleDateString()}, period: ${element.periodNum} ${element.periodUnit}, path: ${element.parameter[0].path}`
           },
         },
         layout: {
@@ -361,7 +385,41 @@ function Gauge({element, disable, size, Resize, setresizing, dashboard, assetId,
 
   return (
     <div>
-      <Doughnut ref={chartReference} plugins={options.plugins} data={options.data} options={options.options} />
+      {element.warning
+        ?<Doughnut ref={chartReference} plugins={options.plugins} data={options.data} options={options.options} />
+        :<div className="system">
+              <div className="element" style={{border: 'none'}}>
+                <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+                  <b>{element.widgetName}</b>
+                  <div style={{fontSize: '10px', opacity: '0.6'}}>
+                    {(new Date(dashboard.startDate)).toLocaleDateString()}, path: {element.parameter[0].path}
+                  </div>
+                </div>
+                <div className="card-value" style={{height: '50%'}}>
+                  <div className="value">
+                  {dataValue.toFixed(element.decimalNumber)}
+                  </div>
+                  <div className="unit" style={{lineHeight: '0'}}>
+                    {element.UnitGauge}
+                  </div>
+                </div>
+                <div style={{display: 'flex', marginTop: '10px'}}>
+                  <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'calc(100%/3)'}}>
+                    <div>{element.periodNum} {element.periodUnit}</div>
+                    <div style={{fontSize: '11px', opacity: '0.8'}}>Period</div>
+                  </div>
+                  <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'calc(100%/3)'}}>
+                    <div>{dataMax}</div>
+                    <div style={{fontSize: '11px', opacity: '0.8'}}>MAX</div>
+                  </div>
+                  <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'calc(100%/3)'}}>
+                    <div>{dataMin}</div>
+                    <div style={{fontSize: '11px', opacity: '0.8'}}>MIN</div>
+                  </div>
+                </div>
+              </div>
+          </div>
+      }
       <i className='tim-icons icon-trash-simple delete' 
       style={!disable?null:{display: 'none'}}
       onClick={handleDelete}

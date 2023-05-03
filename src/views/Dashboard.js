@@ -29,7 +29,6 @@ function Dashboard({asset}) {
   const history = useHistory();
   const dashboards = useSelector(state => state.auth.login.currentUser?.dashboards);
   const dashboardfilter = dashboards.filter(e => (e.asset == asset));
-  console.log(dashboardfilter);
   const _id = useSelector(state => state.auth.login.currentUser?._id);
   const getRoutes = (dashboardfilter) => {
     return dashboardfilter?.map((prop, i) => {
